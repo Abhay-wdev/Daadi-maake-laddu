@@ -220,7 +220,7 @@ const ProductsPage = () => {
             </div>
             <h3 className="text-2xl font-bold text-gray-800 mb-2">No Products Found</h3>
             <p className="text-gray-600 max-w-md mx-auto">
-              We couldn't find any products in this category. Try selecting a different category.
+              We couldn&apos;t find any products in this category. Try selecting a different category.
             </p>
           </div>
         ) : (
