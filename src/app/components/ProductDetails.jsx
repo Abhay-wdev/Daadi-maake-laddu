@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import Image from "next/image";
-import { useParams } from "next/navigation";
+ 
 import { 
   Star, 
   ShoppingCart, 
@@ -31,9 +31,8 @@ import CategoryMore from "./CategoryMore";
 import ProductMore from "./CategoryMore";
 
 const ProductDetails = ({ product }) => {
-const params = useParams();
-  const ProductSlug = params?.ProductSlug;
-
+ 
+ 
   const [selectedImage, setSelectedImage] = useState(0);
   const [quantity, setQuantity] = useState(1);
   const [pincode, setPincode] = useState("");
@@ -563,7 +562,7 @@ const params = useParams();
           </Link>
         </div>
       </div> 
-       <ProductMore params={ProductSlug} />
+       
     </div>
   );
 };
