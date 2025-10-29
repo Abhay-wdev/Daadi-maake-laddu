@@ -1,7 +1,7 @@
 import { create } from "zustand";
 import axios from "axios";
 
-const API_BASE = "http://localhost:5000/api/subcategories";
+const API_BASE = "https://ecom-backend-1-cv44.onrender.com/api/subcategories";
 
 export const useSubCategoryStore = create((set, get) => ({
   subCategories: [],

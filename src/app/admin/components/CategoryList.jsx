@@ -6,6 +6,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import toast, { Toaster } from 'react-hot-toast'; // <-- Added toast
+import Image from "next/image";
 
 // ============================
 // CATEGORY FORM MODAL
@@ -83,11 +84,33 @@ function CategoryFormModal({ category, onClose, token }) {
                 <input type="file" accept="image/*" onChange={handleImageChange} className="hidden" disabled={submitting} />
               </label>
               {imagePreview && (
-                <div className="relative">
-                  <img src={imagePreview} alt="Preview" className="w-16 h-16 object-cover rounded-md border" />
-                  {imageFile && <button type="button" onClick={() => { setImageFile(null); setImagePreview(category?.image || ''); }} className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 hover:bg-red-600" disabled={submitting}><X size={12} /></button>}
-                </div>
+               
+<div className="relative">
+  {imagePreview && (
+    <Image
+      src={imagePreview}
+      alt="Preview"
+      width={64} // must include width
+      height={64} // must include height
+      className="object-cover rounded-md border w-16 h-16"
+    />
+  )}
+  {imageFile && (
+    <button
+      type="button"
+      onClick={() => {
+        setImageFile(null);
+        setImagePreview(category?.image || "");
+      }}
+      className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 hover:bg-red-600"
+      disabled={submitting}
+    >
+      <X size={12} />
+    </button>
+  )}
+</div>
               )}
+              
             </div>
           </div>
           {/* Active */}
@@ -122,8 +145,27 @@ function CategoryDetailModal({ category, onClose, onEdit }) {
           <h2 className="text-xl font-semibold text-gray-800">Category Details</h2>
           <button onClick={onClose} className="text-gray-500 hover:text-gray-700"><X size={24} /></button>
         </div>
+        
         <div className="p-6 space-y-4">
-          {category.image && <div className="w-full h-48 rounded-lg overflow-hidden bg-gray-100"><img src={category.image} alt={category.name} className="w-full h-full object-cover" /></div>}
+         <td className="px-6 py-4">
+  {cat.image ? (
+    <div className="w-12 h-12 relative">
+      <Image
+        src={cat.image}
+        alt={cat.name || "Category image"}
+        fill
+        className="object-cover rounded-lg border"
+        unoptimized  // add this if cat.image is a blob/base64 or dynamic URL
+      />
+    </div>
+  ) : (
+    <div className="w-12 h-12 bg-gray-200 rounded-lg flex items-center justify-center">
+      <span className="text-gray-500 text-xs font-medium">
+        {cat.name.charAt(0).toUpperCase()}
+      </span>
+    </div>
+  )}
+</td>
           <div><label className="text-sm font-medium text-gray-500">Name</label><p className="text-lg font-semibold text-gray-900">{category.name}</p></div>
           <div><label className="text-sm font-medium text-gray-500">Slug</label><p className="text-gray-700 font-mono text-sm">{category.slug}</p></div>
           {category.description && <div><label className="text-sm font-medium text-gray-500">Description</label><p className="text-gray-700">{category.description}</p></div>}

@@ -15,7 +15,7 @@ const ProductPage = () => {
     const fetchProduct = async () => {
       setLoading(true);
       try {
-        const { data } = await axios.get(`http://localhost:5000/api/products/slug/${ProductSlug}`);
+        const { data } = await axios.get(`https://ecom-backend-1-cv44.onrender.com/api/products/slug/${ProductSlug}`);
         setProduct(data.data); // the product object is inside data.data
       } catch (err) {
         console.error(err);

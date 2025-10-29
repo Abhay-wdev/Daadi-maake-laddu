@@ -44,7 +44,7 @@ const ProductsPage = () => {
     const fetchProductsAndCart = async () => {
       setLoading(true);
       try {
-        const res = await fetch("http://localhost:5000/api/products/all");
+        const res = await fetch("https://ecom-backend-1-cv44.onrender.com/api/products/all");
         const data = await res.json();
         let products = data.products || [];
         

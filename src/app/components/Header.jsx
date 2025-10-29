@@ -38,7 +38,7 @@ const Header = () => {
     // Fetch subcategories and products for the navbar
     const fetchProducts = async () => {
       try {
-        const res = await fetch("http://localhost:5000/api/products/all/?limit=100");
+        const res = await fetch("https://ecom-backend-1-cv44.onrender.com/api/products/all/?limit=100");
         const data = await res.json();
 
         // Group products by subCategory

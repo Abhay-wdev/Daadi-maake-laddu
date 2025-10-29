@@ -7,7 +7,7 @@ export default function Navbar() {
 
   useEffect(() => {
     // Fetch products from API
-    fetch("http://localhost:5000/api/products?limit=100")
+    fetch("https://ecom-backend-1-cv44.onrender.com/api/products?limit=100")
       .then((res) => res.json())
       .then((data) => {
         // Group products by subCategory
