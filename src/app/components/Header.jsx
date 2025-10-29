@@ -15,7 +15,7 @@ const Header = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [menuItems, setMenuItems] = useState([
     { title: "Home", href: "/" },
-    { title: "Blogs", href: "/blog" },
+    { title: "Products", href: "/products" },
   ]);
 
   const pathname = usePathname();

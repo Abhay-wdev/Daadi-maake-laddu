@@ -10,8 +10,8 @@ export default function Sidebar({ open, collapsed, setCollapsed, setSidebarOpen 
 
   const navItems = [
     { label: "Category", path: "/admin/category", icon:  <LuComponent /> },
-    { label: "Subcategory", path: "/admin/subcategory", icon: <LuComponent /> },
-    { label: "Services", path: "/services", icon: <LuComponent /> },
+    { label: "Hero Section", path: "/admin/hero", icon: <LuComponent /> },
+    
     // Add more items here
   ];
 

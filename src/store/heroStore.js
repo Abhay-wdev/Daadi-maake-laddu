@@ -1,7 +1,7 @@
 import { create } from "zustand";
 import axios from "axios";
 
-const API_URL = "https://ecom-backend-1-cv44.onrender.com/api/hero";
+const API_URL = "http://localhost:5000/api/hero";
 
 export const useHeroStore = create((set, get) => ({
   heroImages: [],
@@ -18,15 +18,14 @@ export const useHeroStore = create((set, get) => ({
     }
   },
 
-  uploadHeroImages: async (files, links) => {
+  uploadHeroImages: async (formData) => {
     try {
       set({ loading: true });
-      const formData = new FormData();
-      Array.from(files).forEach((file) => formData.append("images", file));
-      links.forEach((link) => formData.append("links", link));
+      
       const { data } = await axios.post(`${API_URL}/upload`, formData, {
         headers: { "Content-Type": "multipart/form-data" },
       });
+      
       set((state) => ({ 
         heroImages: [...state.heroImages, ...data.images], 
         loading: false 
@@ -49,9 +48,9 @@ export const useHeroStore = create((set, get) => ({
     }
   },
 
-  updateHeroImage: async (id, link) => {
+  updateHeroImage: async (id, updates) => {
     try {
-      const { data } = await axios.put(`${API_URL}/${id}`, { link });
+      const { data } = await axios.put(`${API_URL}/${id}`, updates);
       set((state) => ({
         heroImages: state.heroImages.map((img) => 
           img._id === id ? data : img
