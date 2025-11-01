@@ -3,7 +3,7 @@ import axios from "axios";
 
 // Create an Axios instance
 const api = axios.create({
-  baseURL: "https://ecom-backend-1-cv44.onrender.com/api", // Replace with your API base URL
+  baseURL: "https://ecom-backend-4-ysxq.onrender.com/api", // Replace with your API base URL
   headers: {
     "Content-Type": "application/json",
   },

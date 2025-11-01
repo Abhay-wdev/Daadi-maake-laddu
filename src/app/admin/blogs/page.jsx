@@ -8,7 +8,7 @@ export default function BlogDashboard() {
 
   const fetchBlogs = async () => {
     try {
-      const res = await fetch("http://localhost:5000/api/blogs");
+      const res = await fetch("https://ecom-backend-4-ysxq.onrender.com/api/blogs");
       const data = await res.json();
       setBlogs(data.data);
     } catch (error) {
@@ -21,7 +21,7 @@ export default function BlogDashboard() {
   const deleteBlog = async (id) => {
     if (!confirm("Are you sure you want to delete this blog?")) return;
     try {
-      await fetch(`http://localhost:5000/api/blogs/${id}`, {
+      await fetch(`https://ecom-backend-4-ysxq.onrender.com/api/blogs/${id}`, {
         method: "DELETE",
       });
       setBlogs(blogs.filter((b) => b._id !== id));

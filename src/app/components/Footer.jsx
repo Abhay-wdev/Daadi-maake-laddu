@@ -26,7 +26,7 @@ const Footer = () => {
     const fetchProducts = async () => {
       try {
         const res = await fetch(
-          "https://ecom-backend-1-cv44.onrender.com/api/products/all/?limit=100"
+          "https://ecom-backend-4-ysxq.onrender.com/api/products/all/?limit=100"
         );
         const data = await res.json();
 

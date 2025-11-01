@@ -9,7 +9,7 @@ export default function EditBlog() {
   const [blog, setBlog] = useState(null);
 
   useEffect(() => {
-    fetch(`http://localhost:5000/api/blogs/${id}`)
+    fetch(`https://ecom-backend-4-ysxq.onrender.com/api/blogs/${id}`)
       .then((res) => res.json())
       .then((data) => setBlog(data.data));
   }, [id]);
@@ -18,7 +18,7 @@ export default function EditBlog() {
     const fd = new FormData();
     Object.keys(form).forEach((key) => fd.append(key, form[key]));
 
-    const res = await fetch(`http://localhost:5000/api/blogs/${id}`, {
+    const res = await fetch(`https://ecom-backend-4-ysxq.onrender.com/api/blogs/${id}`, {
       method: "PUT",
       body: fd,
     });

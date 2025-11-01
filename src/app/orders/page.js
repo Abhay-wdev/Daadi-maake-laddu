@@ -10,7 +10,7 @@ const OrdersPage = () => {
 
   const user = JSON.parse(localStorage.getItem("user"));
   const token = localStorage.getItem("token");
-  const BASE_URL = "http://localhost:5000/api";
+  const BASE_URL = "https://ecom-backend-4-ysxq.onrender.com/api";
   const primaryColor = "#943900";
 
   // 🟢 Fetch user orders

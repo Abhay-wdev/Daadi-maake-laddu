@@ -17,7 +17,7 @@ const ProductMore = ({ params }) => {
     const fetchData = async () => {
       try {
         const res = await fetch(
-          "https://ecom-backend-1-cv44.onrender.com/api/products/all"
+          "https://ecom-backend-4-ysxq.onrender.com/api/products/all"
         );
         const data = await res.json();
 

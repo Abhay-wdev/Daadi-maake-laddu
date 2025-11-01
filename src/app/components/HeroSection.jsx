@@ -5,7 +5,7 @@ import axios from "axios";
 // Configuration
 const API_BASE_URL =
   process.env.NEXT_PUBLIC_API_URL ||
-  "https://ecom-backend-1-cv44.onrender.com/api";
+  "https://ecom-backend-4-ysxq.onrender.com/api";
 const HERO_IMAGES_ENDPOINT = `${API_BASE_URL}/hero`;
 
 const HeroSection = () => {
