@@ -1,42 +1,72 @@
-'use client';
-import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+"use client";
+import React, { useState, useEffect } from "react";
+import axios from "axios";
 
 // Configuration
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'https://ecom-backend-1-cv44.onrender.com/api';
+const API_BASE_URL =
+  process.env.NEXT_PUBLIC_API_URL ||
+  "https://ecom-backend-1-cv44.onrender.com/api";
 const HERO_IMAGES_ENDPOINT = `${API_BASE_URL}/hero`;
 
 const HeroSection = () => {
   const [heroImages, setHeroImages] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
   const [currentIndex, setCurrentIndex] = useState(0);
 
-  // Fetch hero images on component mount
-  useEffect(() => {
-    const fetchHeroImages = async () => {
-      try {
-        setLoading(true);
-        const response = await axios.get(HERO_IMAGES_ENDPOINT);
-        setHeroImages(response.data);
-        setError('');
-      } catch (err) {
-        setError('Failed to fetch hero images');
-        console.error('Error fetching hero images:', err);
-      } finally {
-        setLoading(false);
-      }
-    };
+  // Function to fetch hero images from API
+  const fetchHeroImages = async () => {
+    try {
+      setLoading(true);
+      const response = await axios.get(HERO_IMAGES_ENDPOINT);
+      const fetchedData = response.data;
 
+      // ✅ Save data with timestamp
+      localStorage.setItem(
+        "heroImages",
+        JSON.stringify({ data: fetchedData, savedAt: Date.now() })
+      );
+
+      setHeroImages(fetchedData);
+      setError("");
+    } catch (err) {
+      setError("Failed to fetch hero images");
+      console.error("Error fetching hero images:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Load from localStorage or API
+  useEffect(() => {
+    const cached = localStorage.getItem("heroImages");
+    const oneDay = 24 * 60 * 60 * 1000; // 24 hours in ms
+
+    if (cached) {
+      const parsed = JSON.parse(cached);
+      const isExpired = Date.now() - parsed.savedAt > oneDay;
+
+      if (!isExpired && parsed.data?.length > 0) {
+        // ✅ Use cached data
+        setHeroImages(parsed.data);
+        setLoading(false);
+        return;
+      } else {
+        // ❌ Expired or invalid — remove
+        localStorage.removeItem("heroImages");
+      }
+    }
+
+    // ✅ Fetch fresh data
     fetchHeroImages();
   }, []);
 
   // Auto-advance carousel
   useEffect(() => {
     if (heroImages.length <= 1) return;
-    
+
     const interval = setInterval(() => {
-      setCurrentIndex((prevIndex) => 
+      setCurrentIndex((prevIndex) =>
         prevIndex === heroImages.length - 1 ? 0 : prevIndex + 1
       );
     }, 5000);
@@ -44,26 +74,22 @@ const HeroSection = () => {
     return () => clearInterval(interval);
   }, [heroImages]);
 
-  const goToSlide = (index) => {
-    setCurrentIndex(index);
-  };
+  const goToSlide = (index) => setCurrentIndex(index);
 
-  const goToPrev = () => {
-    setCurrentIndex((prevIndex) => 
+  const goToPrev = () =>
+    setCurrentIndex((prevIndex) =>
       prevIndex === 0 ? heroImages.length - 1 : prevIndex - 1
     );
-  };
 
-  const goToNext = () => {
-    setCurrentIndex((prevIndex) => 
+  const goToNext = () =>
+    setCurrentIndex((prevIndex) =>
       prevIndex === heroImages.length - 1 ? 0 : prevIndex + 1
     );
-  };
 
   if (loading) {
     return (
       <div className="relative w-full h-96 bg-gray-200 flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[#BB4D00]"></div>
       </div>
     );
   }
@@ -71,7 +97,7 @@ const HeroSection = () => {
   if (error) {
     return (
       <div className="relative w-full h-96 bg-red-50 flex items-center justify-center">
-        <p className="text-red-600">Error loading hero images</p>
+        <p className="text-red-600">{error}</p>
       </div>
     );
   }
@@ -92,12 +118,12 @@ const HeroSection = () => {
           <div
             key={`desktop-${image._id}`}
             className={`absolute inset-0 transition-opacity duration-700 ease-in-out ${
-              index === currentIndex ? 'opacity-100' : 'opacity-0'
+              index === currentIndex ? "opacity-100" : "opacity-0"
             }`}
           >
-            <a 
-              href={image.link} 
-              target="_blank" 
+            <a
+              href={image.link}
+              target="_blank"
               rel="noopener noreferrer"
               className="block w-full h-full"
             >
@@ -108,8 +134,12 @@ const HeroSection = () => {
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent"></div>
               <div className="absolute bottom-8 left-8 max-w-2xl">
-                <h2 className="text-3xl font-bold text-white mb-2">Hero Title {index + 1}</h2>
-                <p className="text-white/90">This is a hero image description. You can customize this text.</p>
+                <h2 className="text-3xl font-bold text-white mb-2">
+                  Hero Title {index + 1}
+                </h2>
+                <p className="text-white/90">
+                  This is a hero image description.
+                </p>
               </div>
             </a>
           </div>
@@ -122,12 +152,12 @@ const HeroSection = () => {
           <div
             key={`mobile-${image._id}`}
             className={`absolute inset-0 transition-opacity duration-700 ease-in-out ${
-              index === currentIndex ? 'opacity-100' : 'opacity-0'
+              index === currentIndex ? "opacity-100" : "opacity-0"
             }`}
           >
-            <a 
-              href={image.link} 
-              target="_blank" 
+            <a
+              href={image.link}
+              target="_blank"
               rel="noopener noreferrer"
               className="block w-full h-full"
             >
@@ -138,8 +168,12 @@ const HeroSection = () => {
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent"></div>
               <div className="absolute bottom-6 left-6 right-6">
-                <h2 className="text-xl font-bold text-white mb-1">Hero Title {index + 1}</h2>
-                <p className="text-white/90 text-sm">This is a hero image description for mobile.</p>
+                <h2 className="text-xl font-bold text-white mb-1">
+                  Hero Title {index + 1}
+                </h2>
+                <p className="text-white/90 text-sm">
+                  This is a hero image description for mobile.
+                </p>
               </div>
             </a>
           </div>
@@ -151,20 +185,43 @@ const HeroSection = () => {
         <>
           <button
             onClick={goToPrev}
-            className="absolute left-4 top-1/2 -translate-y-1/2 bg-white/30 hover:bg-white/50 text-white p-2 rounded-full backdrop-blur-sm transition-all"
+            className="absolute left-4 top-1/2 -translate-y-1/2 bg-[#BB4D00]/70 hover:bg-[#BB4D00]/90 text-white p-2 rounded-full transition-all shadow-md"
             aria-label="Previous slide"
           >
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className="h-6 w-6"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M15 19l-7-7 7-7"
+              />
             </svg>
           </button>
+
           <button
             onClick={goToNext}
-            className="absolute right-4 top-1/2 -translate-y-1/2 bg-white/30 hover:bg-white/50 text-white p-2 rounded-full backdrop-blur-sm transition-all"
+            className="absolute right-4 top-1/2 -translate-y-1/2 bg-[#BB4D00]/70 hover:bg-[#BB4D00]/90 text-white p-2 rounded-full transition-all shadow-md"
             aria-label="Next slide"
           >
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className="h-6 w-6"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M9 5l7 7-7 7"
+              />
             </svg>
           </button>
         </>
@@ -178,7 +235,7 @@ const HeroSection = () => {
               key={index}
               onClick={() => goToSlide(index)}
               className={`w-3 h-3 rounded-full transition-all ${
-                index === currentIndex ? 'bg-white' : 'bg-white/50'
+                index === currentIndex ? "bg-[#BB4D00]" : "bg-white/60"
               }`}
               aria-label={`Go to slide ${index + 1}`}
             />

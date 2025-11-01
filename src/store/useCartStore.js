@@ -1,11 +1,11 @@
+// src/app/store/useCartStore.js
 import { create } from "zustand";
 import axios from "axios";
 
-const API_BASE = "https://ecom-backend-1-cv44.onrender.com/api/cart";
+const API_BASE = "http://localhost:5000/api/cart";
 
 const useCartStore = create((set, get) => ({
   cart: {
-    _id: "",
     user: "",
     items: [],
     discount: 0,
@@ -25,22 +25,17 @@ const useCartStore = create((set, get) => ({
       const { data } = await axios.get(`${API_BASE}/${userId}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
-      // The API returns { success: true, cart: {...} }
       set({ cart: data.cart || get().cart, loading: false });
-      return data.cart; // Return the cart data for use in components
+      return data.cart;
     } catch (err) {
       set({ error: err.response?.data?.message || err.message, loading: false });
       return null;
     }
   },
 
-  // ===============================
-  // ➕ Add item to cart
-  // ===============================
+  // ➕ Add item
   addItem: async (userId, productId, quantity = 1, variant = {}, token) => {
-    const prevCart = get().cart;
     set({ loading: true, error: null });
-
     try {
       const { data } = await axios.post(
         `${API_BASE}/add`,
@@ -55,13 +50,9 @@ const useCartStore = create((set, get) => ({
     }
   },
 
-  // ===============================
-  // ✏️ Update item quantity
-  // ===============================
+  // ✏️ Update item
   updateItem: async (userId, productId, quantity, token) => {
-    const prevCart = get().cart;
     set({ loading: true, error: null });
-
     try {
       const { data } = await axios.put(
         `${API_BASE}/update`,
@@ -76,13 +67,9 @@ const useCartStore = create((set, get) => ({
     }
   },
 
-  // ===============================
-  // ❌ Remove item from cart
-  // ===============================
+  // ❌ Remove item
   removeItem: async (userId, productId, token) => {
-    const prevCart = get().cart;
     set({ loading: true, error: null });
-
     try {
       const { data } = await axios.delete(`${API_BASE}/remove`, {
         headers: { Authorization: `Bearer ${token}` },
@@ -96,27 +83,23 @@ const useCartStore = create((set, get) => ({
     }
   },
 
-  // ===============================
   // 🧹 Clear cart
-  // ===============================
   clearCart: async (userId, token) => {
     set({ loading: true, error: null });
-
     try {
       await axios.delete(`${API_BASE}/clear/${userId}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
-      set({ 
+      set({
         cart: {
-          _id: "",
           user: "",
           items: [],
           discount: 0,
           totalPrice: 0,
           grandTotal: 0,
           status: "active",
-        }, 
-        loading: false 
+        },
+        loading: false,
       });
     } catch (err) {
       set({ error: err.response?.data?.message || err.message, loading: false });
@@ -124,11 +107,8 @@ const useCartStore = create((set, get) => ({
     }
   },
 
-  // ===============================
   // 🎟️ Apply coupon
-  // ===============================
   applyCoupon: async (userId, couponCode, token) => {
-    const prevCart = get().cart;
     set({ loading: true, error: null });
     try {
       const { data } = await axios.post(
@@ -142,6 +122,18 @@ const useCartStore = create((set, get) => ({
       set({ error: err.response?.data?.message || err.message, loading: false });
       throw err;
     }
+  },
+
+  // 🧮 Calculate totals dynamically (optional)
+  calculateTotals: () => {
+    const { cart } = get();
+    const totalPrice = cart.items.reduce(
+      (sum, item) => sum + (item.productSnapshot?.price || 0) * item.quantity,
+      0
+    );
+    const discount = cart.discount || 0;
+    const grandTotal = totalPrice - discount;
+    return { totalPrice, discount, grandTotal };
   },
 }));
 

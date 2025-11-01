@@ -9,9 +9,15 @@ export default function Sidebar({ open, collapsed, setCollapsed, setSidebarOpen 
   const pathname = usePathname();
 
   const navItems = [
-    { label: "Category", path: "/admin/category", icon:  <LuComponent /> },
+     { label: "Orders", path: "/admin/orders", icon: <LuComponent /> },
+       
+     { label: "Quiries", path: "/admin/queries", icon: <LuComponent /> },
+   
+     { label: "Blogs", path: "/admin/blogs", icon: <LuComponent /> },
     { label: "Hero Section", path: "/admin/hero", icon: <LuComponent /> },
     
+    { label: "Company", path: "/admin/company", icon: <LuComponent /> },
+    { label: "Category", path: "/admin/category", icon:  <LuComponent /> },
     // Add more items here
   ];
 
@@ -34,7 +40,7 @@ export default function Sidebar({ open, collapsed, setCollapsed, setSidebarOpen 
       {/* Logo */}
       {(open || typeof window !== "undefined" && window.innerWidth >= 768) && (
         <div className="flex items-center h-19 mb-4 px-3">
-          <div className={`relative overflow-hidden border p-2 rounded ${collapsed ? "h-10 w-20" : "h-10 w-40"}`}>
+          <div className={`relative overflow-hidden   p-2 rounded ${collapsed ? "h-20 w-40" : "h-20 w-60"}`}>
             <img src="/logo.webp" alt="Logo" className="h-full w-full object-contain" />
           </div>
         </div>

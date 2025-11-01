@@ -1,87 +1,115 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import { FaChevronLeft, FaTimes } from "react-icons/fa";
 import { LuComponent } from "react-icons/lu";
 import { CgProfile } from "react-icons/cg";
 
 export default function Sidebar({ open, collapsed, setCollapsed, setSidebarOpen, onSelect, activeLabel }) {
+  const [isMobile, setIsMobile] = useState(false);
+  
+  // Handle responsive behavior
+  useEffect(() => {
+    const checkIsMobile = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+    
+    // Initial check
+    checkIsMobile();
+    
+    // Add event listener for window resize
+    window.addEventListener("resize", checkIsMobile);
+    
+    // Cleanup
+    return () => window.removeEventListener("resize", checkIsMobile);
+  }, []);
+
+  // Force expanded state on mobile - never collapse on small screens
+  const effectiveCollapsed = isMobile ? false : collapsed;
+
   const navItems = [
-    { label: "Profile", icon: <CgProfile /> },
-    { label: "Address", icon: <LuComponent /> },
-    { label: "Cart", icon: <LuComponent /> },
+    { label: "Profile", icon: <CgProfile className="text-xl" /> },
+    { label: "Address", icon: <LuComponent className="text-xl" /> },
+    { label: "Cart", icon: <LuComponent className="text-xl" /> },
     // Add more items here
   ];
 
+  // Theme colors
+  const themeColor = "#943900";
+  const themeLight = "#f9f3ed"; // Light version of theme color for hover
+  const themeActive = "#f5e6d0"; // Light background for active state
+
   return (
     <div
-      className={`fixed top-0 left-0 h-full transition-all duration-300 ease-in-out
-        ${open ? "translate-x-0" : "-translate-x-full"}
-        md:translate-x-0
-        ${collapsed ? "w-[72px]" : "w-[260px]"}
-        shadow-2xl overflow-y-auto bg-white`}
+      className={`h-full transition-all duration-300 ease-in-out
+        ${effectiveCollapsed ? "w-16 md:w-20" : "w-full md:w-64"}
+        shadow-lg overflow-y-auto bg-white`}
     >
-      {/* Mobile close button */}
-      <div className="flex justify-end p-3 md:hidden">
-        <FaTimes
-          className="cursor-pointer text-xl hover:text-red-400 transition"
-          onClick={() => setSidebarOpen(false)}
-        />
-      </div>
+      
 
-      {/* Logo */}
-      {(open || (typeof window !== "undefined" && window.innerWidth >= 768)) && (
-        <div className="flex items-center h-19 mb-4 px-3">
-          <div
-            className={`relative overflow-hidden border p-2 rounded ${
-              collapsed ? "h-10 w-20" : "h-10 w-40"
-            }`}
-          >
-            <img src="/logo.webp" alt="Logo" className="h-full w-full object-contain" />
-          </div>
-        </div>
-      )}
+     
 
-      {/* Collapse button */}
-      <div className="hidden md:flex justify-end mt-5 px-3 pb-3">
-        <FaChevronLeft
+      {/* Collapse button for desktop */}
+      <div className="hidden md:flex justify-end mt-2 px-4 pb-3">
+        <button
           onClick={() => setCollapsed(!collapsed)}
-          className={`cursor-pointer transition-transform duration-300 ${collapsed ? "rotate-180" : ""}`}
-        />
+          className="p-2 rounded-full hover:bg-gray-100 transition-colors"
+          aria-label={effectiveCollapsed ? "Expand sidebar" : "Collapse sidebar"}
+        >
+          <FaChevronLeft
+            className={`cursor-pointer transition-transform duration-300 ${
+              effectiveCollapsed ? "rotate-180" : ""
+            }`}
+            style={{ color: themeColor }}
+          />
+        </button>
       </div>
 
       {/* Navigation */}
-      <ul className="space-y-3 px-2">
-        {navItems.map((item) => {
-          const isActive = activeLabel === item.label;
-          return (
-            <li key={item.label}>
-              <button
-                onClick={() => {
-                  onSelect(item.label);
-                  setSidebarOpen(false);
-                }}
-                className={`group w-full flex items-center gap-4 py-2 rounded-xl transition-all duration-300 ${
-                  isActive ? "font-semibold text-blue-600" : "hover:opacity-80"
-                }`}
-              >
-                {/* Icon */}
-                <div
-                  className={`flex items-center justify-center min-w-10 h-10 rounded-xl text-xl transition-transform duration-300 group-hover:scale-110 ${
-                    collapsed ? "mx-auto" : ""
+      <nav className="px-2 pb-4">
+        <ul className="space-y-1">
+          {navItems.map((item) => {
+            const isActive = activeLabel === item.label;
+            return (
+              <li key={item.label}>
+                <button
+                  onClick={() => {
+                    onSelect(item.label);
+                    if (isMobile) setSidebarOpen(false);
+                  }}
+                  className={`group w-full flex items-center gap-3 p-4 md:p-3 rounded-lg transition-all duration-300 ${
+                    isActive 
+                      ? "font-medium" 
+                      : "text-gray-700"
                   }`}
+                  style={{
+                    backgroundColor: isActive ? themeActive : "transparent",
+                    color: isActive ? themeColor : "inherit"
+                  }}
+                  aria-current={isActive ? "page" : undefined}
                 >
-                  {item.icon}
-                </div>
+                  {/* Icon */}
+                  <div
+                    className={`flex items-center justify-center ${
+                      effectiveCollapsed ? "mx-auto" : ""
+                    }`}
+                    style={{ color: isActive ? themeColor : "inherit" }}
+                  >
+                    {item.icon}
+                  </div>
 
-                {/* Label */}
-                {!collapsed && (
-                  <span className="text-sm font-medium tracking-wide">{item.label}</span>
-                )}
-              </button>
-            </li>
-          );
-        })}
-      </ul>
+                  {/* Label */}
+                  {!effectiveCollapsed && (
+                    <span className="text-base md:text-sm font-medium truncate">
+                      {item.label}
+                    </span>
+                  )}
+                </button>
+              </li>
+            );
+          })}
+        </ul>
+      </nav>
     </div>
   );
 }
