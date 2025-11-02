@@ -26,7 +26,7 @@ export default function ForgotPassword() {
 
     setLoading(true);
     try {
-      const res = await fetch(`https://dadimaabackend.onrender.com/api/auth/forgot-password`, {
+      const res = await fetch(`http://localhost:5000/api/auth/forgot-password`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email }),
@@ -65,7 +65,7 @@ export default function ForgotPassword() {
 
     setLoading(true);
     try {
-      const res = await fetch(`https://dadimaabackend.onrender.com/api/auth/reset-password`, {
+      const res = await fetch(`http://localhost:5000/api/auth/reset-password`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, otp, newPassword }),
@@ -200,10 +200,10 @@ export default function ForgotPassword() {
         {/* Back to Login Link */}
         <div className="mt-8 text-center">
           <button
-            onClick={() => router.push("/login")}
+            onClick={() => router.push("/signup")}
             className="text-amber-700 font-semibold hover:text-amber-800 transition-colors duration-300"
           >
-            Back to Login
+            Back to Sign up
           </button>
         </div>
       </div>

@@ -171,16 +171,7 @@ export default function SignupForm() {
         </p>
       )}
 
-      {/* DEV SHORTCUT (Optional) */}
-      <div className="mt-5 text-center">
-        <button
-          type="button"
-          onClick={() => goToStep(step === 1 ? 2 : 1)}
-          className="text-xs text-gray-500 underline"
-        >
-          Toggle Step (Testing Only)
-        </button>
-      </div>
+       
     </div>
   );
 }

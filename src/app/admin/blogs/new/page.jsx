@@ -24,7 +24,7 @@ export default function CreateBlog() {
 
       if (form.image) fd.append("image", form.image);
 
-      const res = await fetch("https://dadimaabackend.onrender.com/api/blogs", {
+      const res = await fetch("http://localhost:5000/api/blogs", {
         method: "POST",
         body: fd,
       });

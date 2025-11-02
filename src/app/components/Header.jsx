@@ -78,7 +78,7 @@ const Header = () => {
 
         // Fetch from API if no local data found
         const res = await fetch(
-          "https://dadimaabackend.onrender.com/api/products/all/?limit=100"
+          "http://localhost:5000/api/products/all/?limit=100"
         );
         const data = await res.json();
 

@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 
 // Configuration
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'https://dadimaabackend.onrender.com/api';
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
 const IMAGE_UPLOAD_ENDPOINT = `${API_BASE_URL}/hero/upload`;
 const HERO_IMAGES_ENDPOINT = `${API_BASE_URL}/hero`;
 
