@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import toast from 'react-hot-toast';
 
-const API_BASE = "https://ecom-backend-4-ysxq.onrender.com/api/company";
+const API_BASE = "https://dadimaabackend.onrender.com/api/company";
 
 export default function CompanyManagement() {
   const [companies, setCompanies] = useState([]);

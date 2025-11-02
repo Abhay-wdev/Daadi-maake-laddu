@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 
 // Base URL for API
-const BASE_URL = 'https://ecom-backend-4-ysxq.onrender.com/api';
+const BASE_URL = 'https://dadimaabackend.onrender.com/api';
 
 // Order Management Component
 const OrderManagement = () => {

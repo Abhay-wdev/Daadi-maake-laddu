@@ -35,6 +35,7 @@ const Cart = () => {
   useEffect(() => {
     const savedUser = localStorage.getItem("user");
     const savedToken = localStorage.getItem("token");
+    const savedAddressId = localStorage.getItem("shippingAddressId");
     if (savedUser && savedToken) {
       const parsedUser = JSON.parse(savedUser);
       setUser(parsedUser);
@@ -72,9 +73,10 @@ const Cart = () => {
         userId: parsedUser._id,
         addressId: savedAddressId
       };
-      
+      console.log("Placing order with data:", savedAddressId);
+      console.log("Using token:", savedToken);
       // Make the API call
-      const response = await fetch("https://ecom-backend-4-ysxq.onrender.com/api/orders/place-order", {
+      const response = await fetch("https://dadimaabackend.onrender.com/api/orders/place-order", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

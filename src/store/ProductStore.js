@@ -3,7 +3,7 @@ import axios from "axios";
 import toast from "react-hot-toast";
 
 const api = axios.create({
-  baseURL: "https://ecom-backend-4-ysxq.onrender.com/api/products",
+  baseURL: "https://dadimaabackend.onrender.com/api/products",
 });
 
 // Attach JWT token automatically

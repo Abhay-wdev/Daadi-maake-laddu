@@ -10,91 +10,142 @@ export default function SignupForm() {
 
   const [email, setEmail] = useState("");
   const [otp, setOtp] = useState("");
-  const [form, setForm] = useState({ name: "", password: "", phone: "" });
+  const [form, setForm] = useState({
+    name: "",
+    password: "",
+    phone: "",
+  });
+
+  // ----------------------------
+  // HANDLERS
+  // ----------------------------
 
   const handleFormChange = (e) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    setForm((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleSendOtp = async (e) => {
     e.preventDefault();
-    if (!email.includes("@")) return alert("Enter a valid email");
+    if (!email.includes("@")) {
+      alert("Please enter a valid email address.");
+      return;
+    }
     await sendOtp(email);
   };
 
   const handleVerifyOtp = async (e) => {
     e.preventDefault();
+
+    // ✅ Password length check
+    if (form.password.length < 4) {
+      alert("Password must be at least 4 characters long.");
+      return;
+    }
+
     const data = { email, otp, ...form };
     await verifyOtp(data, router);
   };
 
+  // ----------------------------
+  // RENDER
+  // ----------------------------
+
   return (
-    <div className="max-w-md mx-auto mt-16 p-8 border rounded-2xl shadow-lg bg-white">
-      <h2 className="text-2xl font-bold mb-4 text-center text-[#BB4D00]">
+    <div className="max-w-md mx-auto mt-20 p-8 bg-white border border-gray-200 rounded-2xl shadow-lg">
+      <h2 className="text-3xl font-semibold text-center text-[#BB4D00] mb-2">
         Create Account
       </h2>
+      <p className="text-center text-gray-500 mb-6">
+        {step === 1
+          ? "Enter your email to receive an OTP"
+          : "Verify OTP & complete registration"}
+      </p>
 
       {/* STEP 1: Email Input */}
       {step === 1 && (
         <form onSubmit={handleSendOtp} className="space-y-4">
-          <input
-            type="email"
-            placeholder="Enter Email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-            className="w-full border px-3 py-2 rounded-md focus:ring-2 focus:ring-[#BB4D00] outline-none"
-          />
+          <div>
+            <label className="block text-sm text-gray-600 mb-1">
+              Email Address
+            </label>
+            <input
+              type="email"
+              placeholder="example@email.com"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+              className="w-full border border-gray-300 px-3 py-2 rounded-md focus:ring-2 focus:ring-[#BB4D00] outline-none"
+            />
+          </div>
+
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-[#BB4D00] text-white py-2 rounded-md hover:bg-[#a04400] transition"
+            className="w-full bg-[#BB4D00] text-white font-medium py-2 rounded-md hover:bg-[#a04400] transition duration-200"
           >
             {loading ? "Sending OTP..." : "Send OTP"}
           </button>
         </form>
       )}
 
-      {/* STEP 2: OTP + Registration */}
+      {/* STEP 2: OTP + Registration Fields */}
       {step === 2 && (
         <form onSubmit={handleVerifyOtp} className="space-y-4">
-          <input
-            type="text"
-            placeholder="Enter OTP"
-            value={otp}
-            onChange={(e) => setOtp(e.target.value)}
-            required
-            className="w-full border px-3 py-2 rounded-md focus:ring-2 focus:ring-[#BB4D00] outline-none"
-          />
-          <input
-            name="name"
-            type="text"
-            placeholder="Full Name"
-            value={form.name}
-            onChange={handleFormChange}
-            required
-            className="w-full border px-3 py-2 rounded-md focus:ring-2 focus:ring-[#BB4D00] outline-none"
-          />
-          <input
-            name="password"
-            type="password"
-            placeholder="Password"
-            value={form.password}
-            onChange={handleFormChange}
-            required
-            className="w-full border px-3 py-2 rounded-md focus:ring-2 focus:ring-[#BB4D00] outline-none"
-          />
-          <input
-            name="phone"
-            type="text"
-            placeholder="Phone Number"
-            value={form.phone}
-            onChange={handleFormChange}
-            required
-            className="w-full border px-3 py-2 rounded-md focus:ring-2 focus:ring-[#BB4D00] outline-none"
-          />
+          <div>
+            <label className="block text-sm text-gray-600 mb-1">OTP</label>
+            <input
+              type="text"
+              placeholder="Enter 4-digit OTP"
+              value={otp}
+              onChange={(e) => setOtp(e.target.value)}
+              required
+              className="w-full border border-gray-300 px-3 py-2 rounded-md focus:ring-2 focus:ring-[#BB4D00] outline-none"
+            />
+          </div>
 
-          <div className="flex items-center justify-between gap-2">
+          <div>
+            <label className="block text-sm text-gray-600 mb-1">Full Name</label>
+            <input
+              name="name"
+              type="text"
+              placeholder="Your Full Name"
+              value={form.name}
+              onChange={handleFormChange}
+              required
+              className="w-full border border-gray-300 px-3 py-2 rounded-md focus:ring-2 focus:ring-[#BB4D00] outline-none"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm text-gray-600 mb-1">Password</label>
+            <input
+              name="password"
+              type="password"
+              placeholder="Create a Password (min 4 characters)"
+              value={form.password}
+              onChange={handleFormChange}
+              required
+              minLength={4}
+              className="w-full border border-gray-300 px-3 py-2 rounded-md focus:ring-2 focus:ring-[#BB4D00] outline-none"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm text-gray-600 mb-1">Phone Number</label>
+            <input
+              name="phone"
+              type="text"
+              placeholder="Enter Phone Number"
+              value={form.phone}
+              onChange={handleFormChange}
+              required
+              className="w-full border border-gray-300 px-3 py-2 rounded-md focus:ring-2 focus:ring-[#BB4D00] outline-none"
+            />
+          </div>
+
+          {/* ACTION BUTTONS */}
+          <div className="flex items-center justify-between gap-3 mt-4">
             <button
               type="button"
               onClick={() => goToStep(1)}
@@ -113,21 +164,21 @@ export default function SignupForm() {
         </form>
       )}
 
-      {/* Message */}
+      {/* MESSAGE */}
       {message && (
-        <p className="mt-4 text-center text-gray-700 text-sm bg-gray-100 py-2 rounded-md">
+        <p className="mt-5 text-center text-sm text-gray-700 bg-gray-100 py-2 px-3 rounded-md">
           {message}
         </p>
       )}
 
-      {/* 🔍 Dev Shortcut (Optional) */}
-      <div className="mt-4 text-center text-xs text-gray-500">
+      {/* DEV SHORTCUT (Optional) */}
+      <div className="mt-5 text-center">
         <button
           type="button"
           onClick={() => goToStep(step === 1 ? 2 : 1)}
-          className="underline"
+          className="text-xs text-gray-500 underline"
         >
-          Toggle Step (for testing)
+          Toggle Step (Testing Only)
         </button>
       </div>
     </div>

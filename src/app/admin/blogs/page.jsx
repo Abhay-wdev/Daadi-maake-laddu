@@ -8,7 +8,7 @@ export default function BlogDashboard() {
   const [loading, setLoading] = useState(true);
 
   // Base API URL (you can move this to a separate config file if reused)
-  const API_BASE_URL = "https://ecom-backend-4-ysxq.onrender.com/api";
+  const API_BASE_URL = "https://dadimaabackend.onrender.com/api";
 
   // Fetch blogs
   const fetchBlogs = async () => {

@@ -1,7 +1,7 @@
 import { create } from "zustand";
 import axios from "axios";
 
-const API_URL = "https://ecom-backend-4-ysxq.onrender.com/api/hero";
+const API_URL = "https://dadimaabackend.onrender.com/api/hero";
 
 export const useHeroStore = create((set, get) => ({
   heroImages: [],

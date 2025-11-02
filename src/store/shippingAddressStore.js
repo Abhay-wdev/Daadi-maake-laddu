@@ -7,7 +7,7 @@ import axios from "axios";
 // import { useAuthStore } from "./UserStore";
 
 const api = axios.create({
-  baseURL: "https://ecom-backend-4-ysxq.onrender.com/api", // ✅ Add your backend host here
+  baseURL: "https://dadimaabackend.onrender.com/api", // ✅ Add your backend host here
   headers: {
     "Content-Type": "application/json",
   },
