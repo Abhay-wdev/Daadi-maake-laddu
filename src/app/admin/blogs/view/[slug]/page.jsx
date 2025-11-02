@@ -1,7 +1,7 @@
 "use client";
 import React, { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
-import BlogForm from "../../components/BlogForm";
+import BlogForm from "@/app/admin/components/BlogForm";
 
 export default function EditBlog() {
   const { id } = useParams();
