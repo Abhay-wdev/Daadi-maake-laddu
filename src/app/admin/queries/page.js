@@ -20,7 +20,7 @@ import {
   ChevronUp,
 } from "lucide-react";
 
-const API_BASE = "http://localhost:5000/api/contact";
+const API_BASE = "https://dadimaabackend.onrender.com/api/contact";
 
 export default function ContactSystem() {
   const [queries, setQueries] = useState([]);
