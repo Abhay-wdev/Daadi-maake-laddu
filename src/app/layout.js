@@ -6,7 +6,7 @@ import Header from "./components/Header";
 import Footer from "./components/Footer";
 import FloatingCartButton from "./components/FloatingCartButton";
 import { usePathname } from "next/navigation";
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react"; // Added Suspense import
 import { Toaster } from "react-hot-toast";
 
 const geistSans = Geist({
@@ -36,7 +36,10 @@ export default function RootLayout({ children }) {
         {/* ✅ Show Header only if not admin route */}
         {!isAdminRoute && <Header />}
 
-        {children}
+        {/* Wrap children in Suspense boundary */}
+        <Suspense fallback={<div className="flex justify-center items-center h-screen">Loading...</div>}>
+          {children}
+        </Suspense>
 
         {/* ✅ Show Floating Cart only if not admin route */}
         {!isAdminRoute && <FloatingCartButton />}

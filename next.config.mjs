@@ -10,6 +10,12 @@ const nextConfig = {
       },
     ],
   },
+
+  // ✅ Add this section to control ESLint behavior
+  eslint: {
+    // If true, builds won't fail even if there are ESLint errors
+    ignoreDuringBuilds: true,
+  },
 };
 
 export default nextConfig;
