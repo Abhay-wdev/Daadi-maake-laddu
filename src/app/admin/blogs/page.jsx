@@ -1,16 +1,20 @@
 "use client";
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
+import axios from "axios";
 
 export default function BlogDashboard() {
   const [blogs, setBlogs] = useState([]);
   const [loading, setLoading] = useState(true);
 
+  // Base API URL (you can move this to a separate config file if reused)
+  const API_BASE_URL = "https://ecom-backend-4-ysxq.onrender.com/api";
+
+  // Fetch blogs
   const fetchBlogs = async () => {
     try {
-      const res = await fetch("https://ecom-backend-4-ysxq.onrender.com/api/blogs");
-      const data = await res.json();
-      setBlogs(data.data);
+      const res = await axios.get(`${API_BASE_URL}/blogs`);
+      setBlogs(res.data.data);
     } catch (error) {
       console.error("Error fetching blogs:", error);
     } finally {
@@ -18,15 +22,15 @@ export default function BlogDashboard() {
     }
   };
 
+  // Delete a blog
   const deleteBlog = async (id) => {
     if (!confirm("Are you sure you want to delete this blog?")) return;
+
     try {
-      await fetch(`https://ecom-backend-4-ysxq.onrender.com/api/blogs/${id}`, {
-        method: "DELETE",
-      });
-      setBlogs(blogs.filter((b) => b._id !== id));
+      await axios.delete(`${API_BASE_URL}/blogs/${id}`);
+      setBlogs((prevBlogs) => prevBlogs.filter((b) => b._id !== id));
     } catch (error) {
-      console.error("Delete failed:", error);
+      console.error("Error deleting blog:", error);
     }
   };
 
