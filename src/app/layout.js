@@ -47,19 +47,7 @@ export default function RootLayout({ children }) {
         {/* ✅ Show Footer only if not admin route */}
         {!isAdminRoute && <Footer />}
 
-        {/* 🌟 Global Toaster (always active) */}
-        <Toaster
-          position="top-center"
-          toastOptions={{
-            className: "bg-amber-50 text-amber-800 border border-amber-200",
-            style: {
-              borderRadius: "8px",
-              border: "1px solid #fcd34d",
-              background: "#fffbeb",
-              color: "#92400e",
-            },
-          }}
-        />
+         
       </body>
     </html>
   );

@@ -8,7 +8,7 @@ export default function BlogDashboard() {
   const [loading, setLoading] = useState(true);
 
   // Base API URL (you can move this to a separate config file if reused)
-  const API_BASE_URL = "https://dadimaabackend-1.onrender.com/api";
+  const API_BASE_URL = "http://localhost:5000/api";
 
   // Fetch blogs
   const fetchBlogs = async () => {

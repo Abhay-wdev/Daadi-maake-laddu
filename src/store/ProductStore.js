@@ -1,9 +1,8 @@
 import { create } from "zustand";
 import axios from "axios";
-import toast from "react-hot-toast";
 
 const api = axios.create({
-  baseURL: "https://dadimaabackend-1.onrender.com/api/products",
+  baseURL: "http://localhost:5000/api/products",
 });
 
 // Attach JWT token automatically
@@ -46,7 +45,7 @@ export const useProductStore = create((set, get) => ({
       const res = await api.get(query);
       set({ products: res.data.products, loading: false });
     } catch (err) {
-      toast.error(err.response?.data?.message || err.message);
+      console.error("Fetch products error:", err.response?.data?.message || err.message);
       set({ loading: false });
     }
   },
@@ -62,9 +61,8 @@ export const useProductStore = create((set, get) => ({
       const res = await api.post("/", formData);
 
       set((state) => ({ products: [res.data, ...state.products], loading: false }));
-      toast.success("✅ Product created successfully");
     } catch (err) {
-      toast.error(err.response?.data?.message || err.message);
+      console.error("Create product error:", err.response?.data?.message || err.message);
       set({ loading: false });
     }
   },
@@ -83,9 +81,8 @@ export const useProductStore = create((set, get) => ({
         products: state.products.map((p) => (p._id === id ? res.data : p)),
         loading: false,
       }));
-      toast.success("✅ Product updated successfully");
     } catch (err) {
-      toast.error(err.response?.data?.message || err.message);
+      console.error("Update product error:", err.response?.data?.message || err.message);
       set({ loading: false });
     }
   },
@@ -101,9 +98,8 @@ export const useProductStore = create((set, get) => ({
         products: state.products.filter((p) => p._id !== id),
         loading: false,
       }));
-      toast.success("🗑️ Product deleted successfully");
     } catch (err) {
-      toast.error(err.response?.data?.message || err.message);
+      console.error("Delete product error:", err.response?.data?.message || err.message);
       set({ loading: false });
     }
   },

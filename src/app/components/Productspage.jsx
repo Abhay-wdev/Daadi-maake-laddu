@@ -24,9 +24,9 @@ const ProductsPage = () => {
 
   const { cart, addItem, updateItem, removeItem, fetchCart, loading: cartLoading } = useCartStore();
  
-
   const [userId, setUserId] = useState(null);
   const [token, setToken] = useState(null);
+  
   useEffect(() => {
     const storedUser = localStorage.getItem("user");
     const storedToken = localStorage.getItem("token");
@@ -61,7 +61,7 @@ const ProductsPage = () => {
     const fetchProductsAndCart = async () => {
       setLoading(true);
       try {
-        const res = await fetch("https://dadimaabackend-1.onrender.com/api/products/all");
+        const res = await fetch("http://localhost:5000/api/products/all");
         const data = await res.json();
         let products = data.products || [];
         
@@ -162,9 +162,8 @@ const ProductsPage = () => {
 
     try {
       await addItem(userId, productId, 1, {}, token);
-      toast.success(`${product.name} added to cart!`);
+       
       setShowQuantityControls((prev) => ({ ...prev, [productId]: true }));
-      await fetchCart(userId, token);
     } catch (err) {
       console.error(err);
       toast.error("Failed to add product to cart");
@@ -190,7 +189,6 @@ const ProductsPage = () => {
         await updateItem(userId, productId, newQty, token);
         toast.success("Quantity updated!");
       }
-      await fetchCart(userId, token);
     } catch (err) {
       setQuantities((prev) => ({ ...prev, [productId]: current }));
       toast.error("Failed to update quantity");
