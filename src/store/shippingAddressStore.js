@@ -7,7 +7,7 @@ import axios from "axios";
 // import { useAuthStore } from "./UserStore";
 
 const api = axios.create({
-  baseURL: "http://localhost:5000/api", // ✅ Add your backend host here
+  baseURL: "https://dadimaabackend-1.onrender.com/api", // ✅ Add your backend host here
   headers: {
     "Content-Type": "application/json",
   },

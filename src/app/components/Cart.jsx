@@ -76,7 +76,7 @@ const Cart = () => {
       console.log("Placing order with data:", savedAddressId);
       console.log("Using token:", savedToken);
       // Make the API call
-      const response = await fetch("http://localhost:5000/api/orders/place-order", {
+      const response = await fetch("https://dadimaabackend-1.onrender.com/api/orders/place-order", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

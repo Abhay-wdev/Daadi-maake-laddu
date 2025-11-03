@@ -2,7 +2,7 @@ import { create } from "zustand";
 import axios from "axios";
 
 const api = axios.create({
-  baseURL: "http://localhost:5000/api/products",
+  baseURL: "https://dadimaabackend-1.onrender.com/api/products",
 });
 
 // Attach JWT token automatically
