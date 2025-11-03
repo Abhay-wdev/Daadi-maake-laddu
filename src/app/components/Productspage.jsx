@@ -70,7 +70,7 @@ const ProductsPage = () => {
       setLoading(true);
       try {
         // Fetch products
-        const res = await fetch("http://localhost:5000/api/products/all");
+        const res = await fetch("https://dadimaabackend-1.onrender.com/api/products/all");
         const data = await res.json();
         let products = data.products || [];
         
