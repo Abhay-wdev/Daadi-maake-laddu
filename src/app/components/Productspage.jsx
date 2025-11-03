@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import Image from "next/image";
-import { ShoppingBag, Filter, Star, ShoppingCart, Check, Plus, Minus, Heart, Eye } from "lucide-react";
+import { ShoppingBag, Filter, ShoppingCart, Plus, Minus } from "lucide-react";
 import toast, { Toaster } from "react-hot-toast";
 import useCartStore from "../../store/useCartStore";
 import Link from "next/link";
@@ -19,21 +19,29 @@ const ProductsPage = () => {
   const [quantities, setQuantities] = useState({});
   const [updatingItems, setUpdatingItems] = useState({});
   const [showQuantityControls, setShowQuantityControls] = useState({});
-  const [hoveredProduct, setHoveredProduct] = useState(null);
-  const [showAllProducts, setShowAllProducts] = useState(false); // New state for showing all products
+  const [showAllProducts, setShowAllProducts] = useState(false);
 
   const { cart, addItem, updateItem, removeItem, fetchCart, loading: cartLoading } = useCartStore();
  
   const [userId, setUserId] = useState(null);
-  const [token, setToken] = useState(null);
-  
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+
+  // Load user from localStorage
   useEffect(() => {
-    const storedUser = localStorage.getItem("user");
+    const storedUser = localStorage.getItem("userId");
     const storedToken = localStorage.getItem("token");
+    
     if (storedUser && storedToken) {
-      const parsedUser = JSON.parse(storedUser);
-      setUserId(parsedUser._id);
-      setToken(storedToken);
+      try {
+        const parsedUser = storedUser;
+        setUserId(parsedUser);
+        setIsAuthenticated(true);
+      } catch (err) {
+        console.error("Error parsing user:", err);
+        setIsAuthenticated(false);
+      }
+    } else {
+      setIsAuthenticated(false);
     }
   }, []);
 
@@ -61,7 +69,8 @@ const ProductsPage = () => {
     const fetchProductsAndCart = async () => {
       setLoading(true);
       try {
-        const res = await fetch("https://dadimaabackend-1.onrender.com/api/products/all");
+        // Fetch products
+        const res = await fetch("http://localhost:5000/api/products/all");
         const data = await res.json();
         let products = data.products || [];
         
@@ -85,19 +94,20 @@ const ProductsPage = () => {
         });
         setSubCategories(uniqueSubs);
 
-        if (userId && token) {
-          await fetchCart(userId, token);
+        // Fetch cart only if authenticated
+        if (userId && isAuthenticated) {
+          await fetchCart(userId);
         }
       } catch (err) {
         console.error("Failed to fetch products/cart:", err);
-        toast.error("Failed to fetch products or cart");
+        toast.error("Failed to fetch products");
       } finally {
         setLoading(false);
       }
     };
 
     fetchProductsAndCart();
-  }, [fetchCart, userId, token]);
+  }, [fetchCart, userId, isAuthenticated]);
 
   // Handle subcategory filtering from URL query
   useEffect(() => {
@@ -122,18 +132,15 @@ const ProductsPage = () => {
     if (!selectedSubCategory) {
       setFilteredProducts(allProducts);
     } else {
-      // Maintain priority sorting when filtering
       const filtered = allProducts.filter((p) => p.subCategory?._id === selectedSubCategory);
       setFilteredProducts(filtered);
     }
-    // Reset showAllProducts when filter changes
     setShowAllProducts(false);
   }, [selectedSubCategory, allProducts]);
 
   // Handle filter change and update URL
   const handleFilterChange = (subCategoryId) => {
     if (subCategoryId === null) {
-      // Remove query parameter
       const params = new URLSearchParams(searchParams.toString());
       params.delete('subCategory');
       const newUrl = `${pathname}${params.toString() ? `?${params.toString()}` : ''}`;
@@ -151,8 +158,7 @@ const ProductsPage = () => {
   };
 
   const handleAddToCart = async (product) => {
-    // Check if user is logged in
-    if (!userId || !token) {
+    if (!isAuthenticated || !userId) {
       toast.error("Please login to add products to cart");
       return;
     }
@@ -161,9 +167,10 @@ const ProductsPage = () => {
     setUpdatingItems((prev) => ({ ...prev, [productId]: true }));
 
     try {
-      await addItem(userId, productId, 1, {}, token);
-       
+      await addItem(userId, productId, 1, {});
+      toast.success(`${product.name} added to cart!`);
       setShowQuantityControls((prev) => ({ ...prev, [productId]: true }));
+      await fetchCart(userId);
     } catch (err) {
       console.error(err);
       toast.error("Failed to add product to cart");
@@ -173,6 +180,11 @@ const ProductsPage = () => {
   };
 
   const handleQuantityChange = async (productId, delta) => {
+    if (!isAuthenticated || !userId) {
+      toast.error("Please login to update cart");
+      return;
+    }
+
     const current = quantities[productId] || 1;
     const newQty = current + delta;
     if (newQty < 0) return;
@@ -182,13 +194,14 @@ const ProductsPage = () => {
 
     try {
       if (newQty === 0) {
-        await removeItem(userId, productId, token);
+        await removeItem(userId, productId);
         setShowQuantityControls((prev) => ({ ...prev, [productId]: false }));
         toast.success("Item removed from cart");
       } else {
-        await updateItem(userId, productId, newQty, token);
+        await updateItem(userId, productId, newQty);
         toast.success("Quantity updated!");
       }
+      await fetchCart(userId);
     } catch (err) {
       setQuantities((prev) => ({ ...prev, [productId]: current }));
       toast.error("Failed to update quantity");
@@ -202,22 +215,17 @@ const ProductsPage = () => {
 
   const totalCartItems = cart?.items?.reduce((total, item) => total + item.quantity, 0) || 0;
 
-  // Check if we're on the main products page without any subcategory filter
   const isMainProductsPage = pathname === "/products" && !searchParams.get('subCategory');
 
-  // Determine which products to display
   const displayProducts = showAllProducts ? filteredProducts : filteredProducts.slice(0, 8);
 
   return (
-    <div className="min-h-screen   ">
-      {/* Decorative top border */}
-      
-      
+    <div className="min-h-screen">
       <Toaster position="top-right" />
 
       <div className="max-w-8xl mx-auto px-4 py-8">
         
-        {/* --- Header - Only show on main products page --- */}
+        {/* Header - Only show on main products page */}
         {isMainProductsPage && (
           <div className="text-center mb-12">
             <div className="inline-block bg-[#BB4D00] text-white px-6 py-2 rounded-full mb-4">
@@ -231,9 +239,11 @@ const ProductsPage = () => {
             
             <div className="mt-8 flex justify-center">
               <div className="relative">
-                <div className="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-bold rounded-full w-6 h-6 flex items-center justify-center">
-                  {totalCartItems}
-                </div>
+                {totalCartItems > 0 && (
+                  <div className="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-bold rounded-full w-6 h-6 flex items-center justify-center">
+                    {totalCartItems}
+                  </div>
+                )}
                 <Link href="/cart">
                   <div className="bg-[#BB4D00] p-4 rounded-full shadow-lg hover:bg-[#A04000] transition cursor-pointer flex items-center gap-2">
                     <ShoppingBag className="w-6 h-6 text-white" />
@@ -245,7 +255,7 @@ const ProductsPage = () => {
           </div>
         )}
 
-        {/* --- Filter --- */}
+        {/* Filter */}
         <div className="bg-white rounded-2xl p-6 mb-10 shadow-sm border-2 border-[#BB4D00]/20">
           <div className="flex items-center gap-3 flex-wrap justify-center">
             <div className="flex items-center gap-2 bg-[#BB4D00]/10 px-4 py-2 rounded-full">
@@ -278,7 +288,7 @@ const ProductsPage = () => {
           </div>
         </div>
 
-        {/* --- Products --- */}
+        {/* Products */}
         {loading ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
             {[...Array(8)].map((_, i) => (
@@ -315,7 +325,6 @@ const ProductsPage = () => {
                 const isUpdating = updatingItems[productId];
                 const showControls = showQuantityControls[productId];
                 
-                // Priority badge logic
                 const priorityBadge = product.priorityNumber !== undefined && product.priorityNumber > 0 ? (
                   <div className="absolute top-3 right-3 z-10">
                     <span className={`px-3 py-1 rounded-full text-xs font-bold text-white ${
@@ -330,7 +339,6 @@ const ProductsPage = () => {
                   </div>
                 ) : null;
 
-                // Discount badge
                 const discountBadge = product.discount > 0 ? (
                   <div className="absolute top-3 left-3 z-10">
                     <span className="px-3 py-1 rounded-full text-xs font-bold text-white bg-gradient-to-r from-red-500 to-orange-500">
@@ -428,10 +436,10 @@ const ProductsPage = () => {
                         </div>
                       ) : (
                         <>
-                          {!userId || !token ? (
+                          {!isAuthenticated ? (
                             <Link href="/login">
                               <button
-                                className="w-full py-3 text-amber-50 rounded-full font-bold flex items-center justify-center gap-2 shadow-lg transition-all  bg-amber-700 hover:shadow-xl"
+                                className="w-full py-3 text-amber-50 rounded-full font-bold flex items-center justify-center gap-2 shadow-lg transition-all bg-amber-700 hover:shadow-xl"
                               >
                                 Login to Add
                               </button>
@@ -493,8 +501,6 @@ const ProductsPage = () => {
           </>
         )}
       </div>
-      
-      
     </div>
   );
 };

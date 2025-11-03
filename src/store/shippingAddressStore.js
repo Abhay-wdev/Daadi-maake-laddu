@@ -7,7 +7,7 @@ import axios from "axios";
 // import { useAuthStore } from "./UserStore";
 
 const api = axios.create({
-  baseURL: "https://dadimaabackend-1.onrender.com/api", // ✅ Add your backend host here
+  baseURL: "http://localhost:5000/api", // ✅ Add your backend host here
   headers: {
     "Content-Type": "application/json",
   },
@@ -31,41 +31,64 @@ export const useShippingAddressStore = create((set, get) => ({
   // CREATE NEW ADDRESS
   // ==========================
   createAddress: async (data) => {
-    set({ loading: true, message: "", error: "" });
-    try {
-      const res = await api.post("/shippingaddress", data);
-      set((state) => ({
-        addresses: [res.data.data, ...state.addresses],
-        message: res.data.message || "Address added successfully",
-      }));
-    } catch (err) {
-      set({
-        error: err.response?.data?.message || "Error creating address",
-      });
-    } finally {
-      set({ loading: false });
-    }
-  },
+  set({ loading: true, message: "", error: "" });
+  try {
+    const res = await api.post("/shippingaddress", data);
+
+    const newAddress = res.data.data; // newly created address
+    set((state) => ({
+      addresses: [newAddress, ...state.addresses],
+      message: res.data.message || "Address added successfully",
+    }));
+
+    // ✅ Save the newly created address ID to localStorage
+    localStorage.setItem("shippingAddressId", newAddress._id);
+  } catch (err) {
+    set({
+      error: err.response?.data?.message || "Error creating address",
+    });
+  } finally {
+    set({ loading: false });
+  }
+},
+
 
   // ==========================
   // GET ALL ADDRESSES BY USER ID
   // ==========================
-  getUserAddresses: async (userId) => {
-    console.log("Fetching addresses for userId:", userId);
-    if (!userId) return;
-    set({ loading: true, message: "", error: "" });
-    try {
-      const res = await api.get(`/shippingaddress/user/${userId}`);
-      console.log("Fetched addresses:", res.data.data);
-      set({ addresses: res.data.data || [] });
-    } catch (err) {
-      set({
-        error: err.response?.data?.message || "Error fetching addresses",
-      });
-    } finally {
-      set({ loading: false });
+getUserAddresses: async (userId) => {
+  console.log("Fetching addresses for userId:", userId);
+  if (!userId) return;
+
+  set({ loading: true, message: "", error: "" });
+
+  try {
+    const res = await api.get(`/shippingaddress/user/${userId}`);
+    const addresses = res.data.data || [];
+
+     
+
+    // ✅ Save addresses to state
+    set({ addresses });
+
+    // ✅ Save shipping ID to localStorage (example: first address)
+    if (addresses.length > 0 && addresses[0]._id) {
+      localStorage.setItem("shippingAddressId", addresses[0]._id);
+      console.log("Saved shippingId to localStorage:", addresses[0]._id);
+    } else {
+      // Clear if no address found
+      localStorage.removeItem("shippingAddressId");
+      console.log("No shipping address found, cleared from localStorage");
     }
-  },
+  } catch (err) {
+    set({
+      error: err.response?.data?.message || "Error fetching addresses",
+    });
+  } finally {
+    set({ loading: false });
+  }
+},
+
 
   // ==========================
   // GET SINGLE ADDRESS BY ID

@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import useCartStore from "../../store/useCartStore";
 import { Loader2, Trash2, Plus, Minus, ShoppingBag } from "lucide-react";
 import Link from "next/link";
+import toast from "react-hot-toast";
 
 const Cart = () => {
   const pathname = usePathname();
@@ -35,7 +36,7 @@ const Cart = () => {
   useEffect(() => {
     const savedUser = localStorage.getItem("user");
     const savedToken = localStorage.getItem("token");
-    const savedAddressId = localStorage.getItem("shippingAddressId");
+    const savedAddressId = localStorage.getItem("address");
     if (savedUser && savedToken) {
       const parsedUser = JSON.parse(savedUser);
       setUser(parsedUser);
@@ -53,15 +54,15 @@ const Cart = () => {
       const savedUser = localStorage.getItem("user");
       const savedToken = localStorage.getItem("token");
       const savedAddressId = localStorage.getItem("shippingAddressId");
-      
+      console.log("Placing order with address ID:", savedAddressId);
       if (!savedUser || !savedToken) {
-        alert("User not authenticated. Please log in again.");
+        toast.error("User not authenticated. Please log in again.");
         setIsPlacingOrder(false);
         return;
       }
       
-      if (!savedAddressId) {
-        alert("No shipping address found. Please add a shipping address.");
+      if (savedAddressId == null) {
+        toast.error("No shipping address found. Please add a shipping address."); // Fixed: changed from toaster.error to toast.error
         setIsPlacingOrder(false);
         return;
       }
@@ -73,10 +74,8 @@ const Cart = () => {
         userId: parsedUser._id,
         addressId: savedAddressId
       };
-      console.log("Placing order with data:", savedAddressId);
-      console.log("Using token:", savedToken);
-      // Make the API call
-      const response = await fetch("https://dadimaabackend-1.onrender.com/api/orders/place-order", {
+     
+      const response = await fetch("http://localhost:5000/api/orders/place-order", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -89,18 +88,18 @@ const Cart = () => {
       
       if (response.ok) {
         // Order placed successfully
-        alert("Order placed successfully!");
+        toast.success("Order placed successfully!");
         // Clear the cart after successful order
         await clearCart(parsedUser._id, savedToken);
         // Redirect to order confirmation or orders page
         window.location.href = "/orders"; // Adjust the URL as needed
       } else {
         // Handle error
-        alert(`Failed to place order: ${data.message || "Unknown error"}`);
+        toast.error(`Failed to place order: ${data.message || "Unknown error"}`);
       }
     } catch (error) {
       console.error("Error placing order:", error);
-      alert("An error occurred while placing your order. Please try again.");
+      toast.error("An error occurred while placing your order. Please try again.");
     } finally {
       setIsPlacingOrder(false);
     }

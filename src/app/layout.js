@@ -40,7 +40,7 @@ export default function RootLayout({ children }) {
         <Suspense fallback={<div className="flex justify-center items-center h-screen">Loading...</div>}>
           {children}
         </Suspense>
-
+<Toaster position="top-right" />
         {/* ✅ Show Floating Cart only if not admin route */}
         {!isAdminRoute && <FloatingCartButton />}
 

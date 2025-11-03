@@ -1,16 +1,37 @@
 import { create } from "zustand";
 import axios from "axios";
+import toast from "react-hot-toast";
 
 const api = axios.create({
-  baseURL: "https://dadimaabackend-1.onrender.com/api/products",
+  baseURL: "http://localhost:5000/api/products",
 });
 
 // Attach JWT token automatically
 api.interceptors.request.use((config) => {
   const token = localStorage.getItem("token");
-  if (token) config.headers.Authorization = `Bearer ${token}`;
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+    console.log("Token attached to request:", token.substring(0, 10) + "..."); // For debugging
+  } else {
+    console.log("No token found in localStorage");
+  }
   return config;
 });
+
+// Handle token expiration or errors
+api.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.response?.status === 401) {
+      toast.error("Session expired. Please login again.");
+      // Optionally redirect to login page or clear localStorage
+      localStorage.removeItem("token");
+      localStorage.removeItem("user");
+      window.location.href = "/login";
+    }
+    return Promise.reject(error);
+  }
+);
 
 // Convert data to FormData for files + JSON fields
 const appendToFormData = (formData, data) => {
@@ -45,7 +66,7 @@ export const useProductStore = create((set, get) => ({
       const res = await api.get(query);
       set({ products: res.data.products, loading: false });
     } catch (err) {
-      console.error("Fetch products error:", err.response?.data?.message || err.message);
+      toast.error(err.response?.data?.message || err.message);
       set({ loading: false });
     }
   },
@@ -61,8 +82,9 @@ export const useProductStore = create((set, get) => ({
       const res = await api.post("/", formData);
 
       set((state) => ({ products: [res.data, ...state.products], loading: false }));
+      toast.success("✅ Product created successfully");
     } catch (err) {
-      console.error("Create product error:", err.response?.data?.message || err.message);
+      toast.error(err.response?.data?.message || err.message);
       set({ loading: false });
     }
   },
@@ -81,8 +103,9 @@ export const useProductStore = create((set, get) => ({
         products: state.products.map((p) => (p._id === id ? res.data : p)),
         loading: false,
       }));
+      toast.success("✅ Product updated successfully");
     } catch (err) {
-      console.error("Update product error:", err.response?.data?.message || err.message);
+      toast.error(err.response?.data?.message || err.message);
       set({ loading: false });
     }
   },
@@ -98,8 +121,9 @@ export const useProductStore = create((set, get) => ({
         products: state.products.filter((p) => p._id !== id),
         loading: false,
       }));
+      toast.success("🗑️ Product deleted successfully");
     } catch (err) {
-      console.error("Delete product error:", err.response?.data?.message || err.message);
+      toast.error(err.response?.data?.message || err.message);
       set({ loading: false });
     }
   },

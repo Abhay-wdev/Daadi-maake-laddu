@@ -4,7 +4,7 @@ import { create } from "zustand";
 import api from "../app/admin/services/api";
 
 // Define base URL for API calls
-const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "https://dadimaabackend-1.onrender.com/api";
+const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:5000/api";
 
 export const useAuthStore = create((set, get) => ({
   user: null,
@@ -17,47 +17,50 @@ export const useAuthStore = create((set, get) => ({
   // =========================================================
   // 🔹 LOGIN
   // =========================================================
-  login: async (form, router) => {
-    try {
-      set({ loading: true, message: "" });
-      const res = await api.post(`${BASE_URL}/user/login`, form);
+ login: async (form, router) => {
+  try {
+    set({ loading: true, message: "" });
+    const res = await api.post(`${BASE_URL}/user/login`, form);
 
-      if (res.data.success) {
-        const { token, user } = res.data;
+    if (res.data.success) {
+      const { token, user } = res.data;
+console.log("Login successful:", token);
+      // ✅ Save token & user info
+      localStorage.setItem("token", token);
+      localStorage.setItem("user", JSON.stringify(user));
 
-        // Save token & user info
-        localStorage.setItem("token", token);
-        localStorage.setItem("user", JSON.stringify(user));
-
-        // Save default shipping address if exists
-        if (user?.address?._id) {
-          localStorage.setItem("shippingAddressId", user.address._id);
-        } else if (user?.addresses?.length > 0) {
-          const defaultAddr =
-            user.addresses.find((a) => a.isDefault) || user.addresses[0];
-          if (defaultAddr?._id) {
-            localStorage.setItem("shippingAddressId", defaultAddr._id);
-          }
-        }
-
-        // Update store
-        set({ user, token, message: "Login successful!" });
-
-        // Redirect by role
-        const allowedRoles = ["admin", "seller", "manager"];
-        const route = allowedRoles.includes(user.role) ? "/admin" : "/";
-        setTimeout(() => router.push(route), 1500);
-      } else {
-        set({ message: res.data.message || "Invalid credentials" });
+      // ✅ Save user ID separately for easy access
+      if (user?._id) {
+        localStorage.setItem("userId", user._id);
       }
-    } catch (err) {
+
+      // ✅ Save default shipping address if exists
+      if (user?.address?._id) {
+        localStorage.setItem("createdAddressId", user.address._id);
+      } else if (user?.addresses?.length > 0) {
+        const defaultAddr =
+          user.addresses.find((a) => a.isDefault) || user.addresses[0];
+        if (defaultAddr?._id) {
+          localStorage.setItem("createdAddressId", defaultAddr._id);
+        }
+      }
+
+      // ✅ Optional: redirect after login
+      if (router) router.push("/");
+      
       set({
-        message: err.response?.data?.message || "Login failed. Try again.",
+        loading: false,
+        message: res.data.message || "Login successful",
       });
-    } finally {
-      set({ loading: false });
     }
-  },
+  } catch (err) {
+    set({
+      loading: false,
+      error: err.response?.data?.message || err.message,
+    });
+  }
+},
+
 
   // =========================================================
   // 🔹 LOGOUT
