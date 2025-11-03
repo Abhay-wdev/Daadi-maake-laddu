@@ -2,7 +2,7 @@
 import { create } from "zustand";
 import axios from "axios";
 
-const API_BASE = "https://dadimaabackend.onrender.com/api/cart";
+const API_BASE = "https://dadimaabackend-1.onrender.com/api/cart";
 
 const useCartStore = create((set, get) => ({
   cart: {

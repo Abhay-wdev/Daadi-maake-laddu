@@ -1,5 +1,6 @@
 "use client";
 import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import {
   Mail,
   User,
@@ -20,9 +21,10 @@ import {
   ChevronUp,
 } from "lucide-react";
 
-const API_BASE = "https://dadimaabackend.onrender.com/api/contact";
+const API_BASE = "https://dadimaabackend-1.onrender.com/api/contact";
 
 export default function ContactSystem() {
+  const router = useRouter();
   const [queries, setQueries] = useState([]);
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState({ type: "", text: "" });
@@ -33,23 +35,52 @@ export default function ContactSystem() {
   const [replyText, setReplyText] = useState("");
   const [sortConfig, setSortConfig] = useState({ key: 'createdAt', direction: 'descending' });
 
+  // Check authentication on component mount
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    if (!token) {
+      router.push('/login');
+      return;
+    }
+    fetchQueries();
+  }, [router]);
+
+  // Get auth token for API requests
+  const getAuthHeaders = () => {
+    const token = localStorage.getItem('token');
+    return token ? { 
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}` 
+    } : { 'Content-Type': 'application/json' };
+  };
+
   // Fetch all queries (admin view)
   const fetchQueries = async () => {
     try {
       setLoading(true);
-      const response = await fetch(API_BASE);
+      const response = await fetch(API_BASE, {
+        headers: getAuthHeaders()
+      });
+      
+      if (response.status === 401) {
+        // Token expired or invalid
+        localStorage.removeItem('token');
+        router.push('/login');
+        return;
+      }
+      
       const data = await response.json();
-      setQueries(data);
+      
+      // Ensure data is an array
+      setQueries(Array.isArray(data) ? data : []);
     } catch (error) {
+      console.error("Error fetching queries:", error);
       showMessage("error", "Failed to fetch queries");
+      setQueries([]); // Set empty array on error
     } finally {
       setLoading(false);
     }
   };
-
-  useEffect(() => {
-    fetchQueries();
-  }, []);
 
   const showMessage = (type, text) => {
     setMessage({ type, text });
@@ -67,9 +98,16 @@ export default function ContactSystem() {
       setLoading(true);
       const response = await fetch(`${API_BASE}/reply/${currentQuery._id}`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: getAuthHeaders(),
         body: JSON.stringify({ reply: replyText }),
       });
+
+      if (response.status === 401) {
+        // Token expired or invalid
+        localStorage.removeItem('token');
+        router.push('/login');
+        return;
+      }
 
       const data = await response.json();
 
@@ -124,9 +162,18 @@ export default function ContactSystem() {
       : <ChevronDown className="w-4 h-4" />;
   };
 
-  // Filter and sort queries
-  const filteredQueries = queries
+  // Logout function
+  const handleLogout = () => {
+    localStorage.removeItem('token');
+    router.push('/login');
+  };
+
+  // Filter and sort queries with safety checks
+  const filteredQueries = Array.isArray(queries) ? queries
     .filter(query => {
+      // Check if query exists and has required properties
+      if (!query || !query.name || !query.email || !query.message) return false;
+      
       const matchesSearch = 
         query.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
         query.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -140,6 +187,8 @@ export default function ContactSystem() {
       return matchesSearch && matchesFilter;
     })
     .sort((a, b) => {
+      if (!a || !b) return 0;
+      
       if (a[sortConfig.key] < b[sortConfig.key]) {
         return sortConfig.direction === 'ascending' ? -1 : 1;
       }
@@ -147,12 +196,25 @@ export default function ContactSystem() {
         return sortConfig.direction === 'ascending' ? 1 : -1;
       }
       return 0;
-    });
+    }) : [];
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-orange-50 to-amber-50 p-6">
       <div className="max-w-7xl mx-auto">
-        
+        {/* Header with logout button */}
+        <div className="flex justify-between items-center mb-8">
+          <div>
+            <h1 className="text-3xl font-bold text-gray-900 mb-2">Contact Management System</h1>
+            <p className="text-gray-600">Manage and respond to customer inquiries</p>
+          </div>
+          <button
+            onClick={handleLogout}
+            className="flex items-center gap-2 bg-red-100 hover:bg-red-200 text-red-700 py-2 px-4 rounded-lg transition-colors"
+          >
+            <LogOut className="w-4 h-4" />
+            Logout
+          </button>
+        </div>
 
         {/* Message Alert */}
         {message.text && (
@@ -231,7 +293,7 @@ export default function ContactSystem() {
                 <div>
                   <p className="text-sm text-green-600">Replied</p>
                   <p className="text-2xl font-bold text-green-800">
-                    {queries.filter(q => q.reply).length}
+                    {queries.filter(q => q && q.reply).length}
                   </p>
                 </div>
               </div>
@@ -245,7 +307,7 @@ export default function ContactSystem() {
                 <div>
                   <p className="text-sm text-orange-600">Pending</p>
                   <p className="text-2xl font-bold text-orange-800">
-                    {queries.filter(q => !q.reply).length}
+                    {queries.filter(q => q && !q.reply).length}
                   </p>
                 </div>
               </div>
@@ -363,7 +425,7 @@ export default function ContactSystem() {
 
       {/* Reply Modal */}
       {isModalOpen && currentQuery && (
-        <div className="fixed inset-0  bg-amber-400 flex items-center justify-center p-4 z-50">
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
           <div className="bg-white border-2 border-amber-600 rounded-xl shadow-xl max-w-2xl w-full max-h-[90vh] overflow-hidden flex flex-col">
             <div className="px-6 py-4 border-b border-gray-200 flex justify-between items-center">
               <h3 className="text-xl font-bold text-gray-800">

@@ -12,7 +12,7 @@ const OtpVerification = ({ formData, setStep }) => {
     e.preventDefault();
 
     try {
-      const res = await axios.post("https://dadimaabackend.onrender.com/auth/verify-otp", {
+      const res = await axios.post("https://dadimaabackend-1.onrender.com/auth/verify-otp", {
         ...formData,
         otp,
       });

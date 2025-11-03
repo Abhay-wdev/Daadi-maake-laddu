@@ -3,7 +3,7 @@ import axios from "axios";
 
 // Create an Axios instance
 const api = axios.create({
-  baseURL: "https://dadimaabackend.onrender.com/api", // Replace with your API base URL
+  baseURL: "https://dadimaabackend-1.onrender.com/api", // Replace with your API base URL
   headers: {
     "Content-Type": "application/json",
   },

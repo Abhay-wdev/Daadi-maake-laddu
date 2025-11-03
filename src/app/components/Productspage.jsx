@@ -61,7 +61,7 @@ const ProductsPage = () => {
     const fetchProductsAndCart = async () => {
       setLoading(true);
       try {
-        const res = await fetch("https://dadimaabackend.onrender.com/api/products/all");
+        const res = await fetch("https://dadimaabackend-1.onrender.com/api/products/all");
         const data = await res.json();
         let products = data.products || [];
         
@@ -433,7 +433,7 @@ const ProductsPage = () => {
                           {!userId || !token ? (
                             <Link href="/login">
                               <button
-                                className="w-full py-3 rounded-full font-bold flex items-center justify-center gap-2 shadow-lg transition-all bg-blue-600 text-white hover:bg-blue-700 hover:shadow-xl"
+                                className="w-full py-3 text-amber-50 rounded-full font-bold flex items-center justify-center gap-2 shadow-lg transition-all  bg-amber-700 hover:shadow-xl"
                               >
                                 Login to Add
                               </button>

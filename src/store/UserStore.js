@@ -4,7 +4,7 @@ import { create } from "zustand";
 import api from "../app/admin/services/api";
 
 // Define base URL for API calls
-const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "https://dadimaabackend.onrender.com/api";
+const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "https://dadimaabackend-1.onrender.com/api";
 
 export const useAuthStore = create((set, get) => ({
   user: null,

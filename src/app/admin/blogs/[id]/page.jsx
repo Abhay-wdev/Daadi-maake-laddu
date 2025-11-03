@@ -10,7 +10,7 @@ export default function EditBlog() {
   const [blog, setBlog] = useState(null);
 
   useEffect(() => {
-    fetch(`https://dadimaabackend.onrender.com/api/blogs/${id}`)
+    fetch(`https://dadimaabackend-1.onrender.com/api/blogs/${id}`)
       .then((res) => res.json())
       .then((data) => setBlog(data.data));
   }, [id]);
@@ -19,7 +19,7 @@ export default function EditBlog() {
     const fd = new FormData();
     Object.keys(form).forEach((key) => fd.append(key, form[key]));
 
-    const res = await fetch(`https://dadimaabackend.onrender.com/api/blogs/${id}`, {
+    const res = await fetch(`https://dadimaabackend-1.onrender.com/api/blogs/${id}`, {
       method: "PUT",
       body: fd,
     });
