@@ -1,10 +1,29 @@
 "use client";
-import React from "react";
+import React, { useEffect } from "react";
+import { useRouter } from "next/navigation";
 import BlogForm from "../../components/BlogForm";
 
 export default function CreateBlog() {
+  const router = useRouter();
+
+  useEffect(() => {
+    // Check for authentication token
+    const token = localStorage.getItem("token");
+    if (!token) {
+      alert("Please login to create a blog.");
+      router.push("/login");
+    }
+  }, [router]);
+
   const handleSubmit = async (form) => {
     try {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        alert("Unauthorized! Please log in again.");
+        router.push("/login");
+        return;
+      }
+
       const fd = new FormData();
       fd.append("title", form.title);
       fd.append("author", form.author);
@@ -13,7 +32,7 @@ export default function CreateBlog() {
       fd.append("isPublished", form.isPublished);
       fd.append("htmlContent", form.htmlContent);
 
-      // Store content as JSON (Editor.js compatible)
+      // Store content as JSON (for Editor.js or similar)
       fd.append(
         "content",
         JSON.stringify({
@@ -26,6 +45,9 @@ export default function CreateBlog() {
 
       const res = await fetch("https://dadimaabackend-1.onrender.com/api/blogs", {
         method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`, // ✅ secure token header
+        },
         body: fd,
       });
 
@@ -33,6 +55,7 @@ export default function CreateBlog() {
 
       if (res.ok && data.success) {
         alert("✅ Blog created successfully!");
+        router.push("/admin/blogs"); // redirect after success
       } else {
         alert("❌ Failed: " + (data.message || "Unknown error"));
         console.error("Response:", data);

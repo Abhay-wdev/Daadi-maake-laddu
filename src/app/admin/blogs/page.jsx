@@ -2,43 +2,79 @@
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import axios from "axios";
+import { useRouter } from "next/navigation";
 
 export default function BlogDashboard() {
   const [blogs, setBlogs] = useState([]);
   const [loading, setLoading] = useState(true);
+  const router = useRouter();
 
-  // Base API URL (you can move this to a separate config file if reused)
+  // Base API URL (Change to your deployed backend when needed)
   const API_BASE_URL = "https://dadimaabackend-1.onrender.com/api";
 
-  // Fetch blogs
-  const fetchBlogs = async () => {
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+
+    // Redirect if not logged in
+    if (!token) {
+      alert("Please login to access the dashboard.");
+      router.push("/login");
+      return;
+    }
+
+    // Fetch blogs if token exists
+    fetchBlogs(token);
+  }, [router]);
+
+  // Fetch blogs with token
+  const fetchBlogs = async (token) => {
     try {
-      const res = await axios.get(`${API_BASE_URL}/blogs`);
-      setBlogs(res.data.data);
+      const res = await axios.get(`${API_BASE_URL}/blogs`, {
+        headers: {
+          Authorization: `Bearer ${token}`, // ✅ include token
+        },
+      });
+
+      setBlogs(res.data.data || []);
     } catch (error) {
       console.error("Error fetching blogs:", error);
+      if (error.response?.status === 401) {
+        alert("Session expired! Please log in again.");
+        localStorage.removeItem("token");
+        router.push("/login");
+      }
     } finally {
       setLoading(false);
     }
   };
 
-  // Delete a blog
+  // Delete a blog securely
   const deleteBlog = async (id) => {
     if (!confirm("Are you sure you want to delete this blog?")) return;
 
+    const token = localStorage.getItem("token");
+    if (!token) {
+      alert("Unauthorized! Please log in again.");
+      router.push("/login");
+      return;
+    }
+
     try {
-      await axios.delete(`${API_BASE_URL}/blogs/${id}`);
-      setBlogs((prevBlogs) => prevBlogs.filter((b) => b._id !== id));
+      await axios.delete(`${API_BASE_URL}/blogs/${id}`, {
+        headers: {
+          Authorization: `Bearer ${token}`, // ✅ include token
+        },
+      });
+
+      setBlogs((prev) => prev.filter((b) => b._id !== id));
+      alert("🗑 Blog deleted successfully!");
     } catch (error) {
       console.error("Error deleting blog:", error);
+      alert("❌ Failed to delete blog.");
     }
   };
 
-  useEffect(() => {
-    fetchBlogs();
-  }, []);
-
-  if (loading) return <p className="text-center mt-10">Loading blogs...</p>;
+  if (loading) return <p className="text-center mt-10">Loading...</p>;
 
   return (
     <div className="max-w-6xl mx-auto py-10 px-4">

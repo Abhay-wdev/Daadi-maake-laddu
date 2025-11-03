@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from "react";
 import { useCategoryStore } from "../../../store/CategoryStore";
 import {
-  Pencil, Trash2, Plus, X, Upload, Loader2, AlertCircle, CheckCircle, Search, Eye
+  Pencil, Trash2, Plus, X, Upload, Loader2, AlertCircle, CheckCircle, Search, Eye, Package
 } from "lucide-react";
 import Link from "next/link";
 import toast, { Toaster } from 'react-hot-toast';
@@ -507,6 +507,11 @@ export default function CategoryManager() {
                         >
                           <Eye size={18} />
                         </button>
+                        <Link href={`/admin/category/${cat._id}`}>
+                          <button className="text-purple-600 hover:text-purple-800 transition" title="View Products">
+                            <Package size={18} />
+                          </button>
+                        </Link>
                         <button
                           onClick={() => {
                             setEditingCategory(cat);
