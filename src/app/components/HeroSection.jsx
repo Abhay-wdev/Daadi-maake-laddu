@@ -132,15 +132,8 @@ const HeroSection = () => {
                 alt={`Hero slide ${index}`}
                 className="w-full h-full object-cover"
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent"></div>
-              <div className="absolute bottom-8 left-8 max-w-2xl">
-                <h2 className="text-3xl font-bold text-white mb-2">
-                  Hero Title {index + 1}
-                </h2>
-                <p className="text-white/90">
-                  This is a hero image description.
-                </p>
-              </div>
+               
+               
             </a>
           </div>
         ))}
@@ -167,14 +160,7 @@ const HeroSection = () => {
                 className="w-full h-full object-cover"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent"></div>
-              <div className="absolute bottom-6 left-6 right-6">
-                <h2 className="text-xl font-bold text-white mb-1">
-                  Hero Title {index + 1}
-                </h2>
-                <p className="text-white/90 text-sm">
-                  This is a hero image description for mobile.
-                </p>
-              </div>
+               
             </a>
           </div>
         ))}
