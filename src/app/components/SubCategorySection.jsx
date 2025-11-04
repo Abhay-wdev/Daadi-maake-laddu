@@ -111,10 +111,7 @@ const SubCategorySection = () => {
               {sub.name}
             </h3>
 
-            {/* Description */}
-            <p className="text-gray-500 text-sm mt-2">
-              Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-            </p>
+          
           </Link>
         ))}
       </div>
