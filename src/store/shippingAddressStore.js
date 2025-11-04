@@ -3,11 +3,8 @@
 import { create } from "zustand";
 import axios from "axios";
 
-// Optional: import auth store if needed
-// import { useAuthStore } from "./UserStore";
-
 const api = axios.create({
-  baseURL: "https://dadimaabackend-1.onrender.com/api", // ✅ Add your backend host here
+  baseURL: "https://dadimaabackend-2.onrender.com/api",
   headers: {
     "Content-Type": "application/json",
   },
@@ -15,10 +12,35 @@ const api = axios.create({
 
 // Automatically attach token if available
 api.interceptors.request.use((config) => {
-  const token = typeof window !== "undefined" ? localStorage.getItem("token") : null;
-  if (token) config.headers.Authorization = `Bearer ${token}`;
+  // Check if window is defined (client-side only)
+  if (typeof window !== "undefined") {
+    const token = localStorage.getItem("token");
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+  }
   return config;
 });
+
+// Helper function to safely use localStorage
+const safeLocalStorage = {
+  getItem: (key) => {
+    if (typeof window !== "undefined") {
+      return localStorage.getItem(key);
+    }
+    return null;
+  },
+  setItem: (key, value) => {
+    if (typeof window !== "undefined") {
+      localStorage.setItem(key, value);
+    }
+  },
+  removeItem: (key) => {
+    if (typeof window !== "undefined") {
+      localStorage.removeItem(key);
+    }
+  }
+};
 
 export const useShippingAddressStore = create((set, get) => ({
   addresses: [],
@@ -31,79 +53,96 @@ export const useShippingAddressStore = create((set, get) => ({
   // CREATE NEW ADDRESS
   // ==========================
   createAddress: async (data) => {
-  set({ loading: true, message: "", error: "" });
-  try {
-    const res = await api.post("/shippingaddress", data);
+    set({ loading: true, message: "", error: "" });
+    try {
+      const res = await api.post("/shippingaddress", data);
+      const newAddress = res.data.data;
+      
+      set((state) => ({
+        addresses: [newAddress, ...state.addresses],
+        message: res.data.message || "Address added successfully",
+        loading: false,
+      }));
 
-    const newAddress = res.data.data; // newly created address
-    set((state) => ({
-      addresses: [newAddress, ...state.addresses],
-      message: res.data.message || "Address added successfully",
-    }));
-
-    // ✅ Save the newly created address ID to localStorage
-    localStorage.setItem("shippingAddressId", newAddress._id);
-  } catch (err) {
-    set({
-      error: err.response?.data?.message || "Error creating address",
-    });
-  } finally {
-    set({ loading: false });
-  }
-},
-
+      // Save the newly created address ID to localStorage
+      safeLocalStorage.setItem("shippingAddressId", newAddress._id);
+      
+      return { success: true, data: newAddress };
+    } catch (err) {
+      const errorMsg = err.response?.data?.message || "Error creating address";
+      set({
+        error: errorMsg,
+        loading: false,
+      });
+      return { success: false, error: errorMsg };
+    }
+  },
 
   // ==========================
   // GET ALL ADDRESSES BY USER ID
   // ==========================
-getUserAddresses: async (userId) => {
-  console.log("Fetching addresses for userId:", userId);
-  if (!userId) return;
-
-  set({ loading: true, message: "", error: "" });
-
-  try {
-    const res = await api.get(`/shippingaddress/user/${userId}`);
-    const addresses = res.data.data || [];
-
-     
-
-    // ✅ Save addresses to state
-    set({ addresses });
-
-    // ✅ Save shipping ID to localStorage (example: first address)
-    if (addresses.length > 0 && addresses[0]._id) {
-      localStorage.setItem("shippingAddressId", addresses[0]._id);
-      console.log("Saved shippingId to localStorage:", addresses[0]._id);
-    } else {
-      // Clear if no address found
-      localStorage.removeItem("shippingAddressId");
-      console.log("No shipping address found, cleared from localStorage");
+  getUserAddresses: async (userId) => {
+    if (!userId) {
+      console.error("getUserAddresses: userId is required");
+      return;
     }
-  } catch (err) {
-    set({
-      error: err.response?.data?.message || "Error fetching addresses",
-    });
-  } finally {
-    set({ loading: false });
-  }
-},
 
+    set({ loading: true, message: "", error: "" });
+
+    try {
+      const res = await api.get(`/shippingaddress/user/${userId}`);
+      const addresses = res.data.data || [];
+
+      set({ 
+        addresses,
+        loading: false,
+      });
+
+      // Save the first address ID to localStorage (or the default one)
+      if (addresses.length > 0) {
+        const defaultAddress = addresses.find(addr => addr.isDefault) || addresses[0];
+        safeLocalStorage.setItem("shippingAddressId", defaultAddress._id);
+        console.log("Saved shippingAddressId to localStorage:", defaultAddress._id);
+      } else {
+        safeLocalStorage.removeItem("shippingAddressId");
+        console.log("No shipping address found, cleared from localStorage");
+      }
+
+      return { success: true, data: addresses };
+    } catch (err) {
+      const errorMsg = err.response?.data?.message || "Error fetching addresses";
+      set({
+        error: errorMsg,
+        loading: false,
+      });
+      return { success: false, error: errorMsg };
+    }
+  },
 
   // ==========================
   // GET SINGLE ADDRESS BY ID
   // ==========================
   getAddressById: async (id) => {
+    if (!id) {
+      console.error("getAddressById: id is required");
+      return;
+    }
+
     set({ loading: true, message: "", error: "" });
     try {
       const res = await api.get(`/shippingaddress/${id}`);
-      set({ currentAddress: res.data.data });
-    } catch (err) {
-      set({
-        error: err.response?.data?.message || "Error fetching address",
+      set({ 
+        currentAddress: res.data.data,
+        loading: false,
       });
-    } finally {
-      set({ loading: false });
+      return { success: true, data: res.data.data };
+    } catch (err) {
+      const errorMsg = err.response?.data?.message || "Error fetching address";
+      set({
+        error: errorMsg,
+        loading: false,
+      });
+      return { success: false, error: errorMsg };
     }
   },
 
@@ -111,19 +150,38 @@ getUserAddresses: async (userId) => {
   // UPDATE ADDRESS
   // ==========================
   updateAddress: async (id, updatedData) => {
+    if (!id) {
+      console.error("updateAddress: id is required");
+      return;
+    }
+
     set({ loading: true, message: "", error: "" });
     try {
       const res = await api.put(`/shippingaddress/${id}`, updatedData);
+      const updatedAddress = res.data.data;
+      
       set((state) => ({
-        addresses: state.addresses.map((a) => (a._id === id ? res.data.data : a)),
+        addresses: state.addresses.map((a) => 
+          a._id === id ? updatedAddress : a
+        ),
         message: res.data.message || "Address updated successfully",
+        loading: false,
       }));
+
+      // Update localStorage if this was the stored address
+      const storedId = safeLocalStorage.getItem("shippingAddressId");
+      if (storedId === id) {
+        safeLocalStorage.setItem("shippingAddressId", updatedAddress._id);
+      }
+
+      return { success: true, data: updatedAddress };
     } catch (err) {
+      const errorMsg = err.response?.data?.message || "Error updating address";
       set({
-        error: err.response?.data?.message || "Error updating address",
+        error: errorMsg,
+        loading: false,
       });
-    } finally {
-      set({ loading: false });
+      return { success: false, error: errorMsg };
     }
   },
 
@@ -131,24 +189,55 @@ getUserAddresses: async (userId) => {
   // DELETE ADDRESS
   // ==========================
   deleteAddress: async (id) => {
+    if (!id) {
+      console.error("deleteAddress: id is required");
+      return;
+    }
+
     set({ loading: true, message: "", error: "" });
     try {
       const res = await api.delete(`/shippingaddress/${id}`);
+      
       set((state) => ({
         addresses: state.addresses.filter((a) => a._id !== id),
         message: res.data.message || "Address deleted successfully",
+        loading: false,
       }));
+
+      // Remove from localStorage if it was the stored address
+      const storedId = safeLocalStorage.getItem("shippingAddressId");
+      if (storedId === id) {
+        safeLocalStorage.removeItem("shippingAddressId");
+      }
+
+      return { success: true };
     } catch (err) {
+      const errorMsg = err.response?.data?.message || "Error deleting address";
       set({
-        error: err.response?.data?.message || "Error deleting address",
+        error: errorMsg,
+        loading: false,
       });
-    } finally {
-      set({ loading: false });
+      return { success: false, error: errorMsg };
     }
+  },
+
+  // ==========================
+  // GET STORED ADDRESS ID
+  // ==========================
+  getStoredAddressId: () => {
+    return safeLocalStorage.getItem("shippingAddressId");
   },
 
   // ==========================
   // RESET STORE STATE
   // ==========================
   clearMessages: () => set({ message: "", error: "" }),
+  
+  resetStore: () => set({ 
+    addresses: [], 
+    currentAddress: null, 
+    loading: false, 
+    message: "", 
+    error: "" 
+  }),
 }));

@@ -12,7 +12,7 @@ export default function BlogDetails() {
   useEffect(() => {
     const fetchBlog = async () => {
       try {
-        const res = await fetch(`https://dadimaabackend-1.onrender.com/api/blogs/slug/${slug}`);
+        const res = await fetch(`https://dadimaabackend-2.onrender.com/api/blogs/slug/${slug}`);
         const data = await res.json();
         console.log("Fetched blog data:", data);
         setBlog(data.data);

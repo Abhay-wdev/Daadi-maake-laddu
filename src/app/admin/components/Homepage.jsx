@@ -61,7 +61,7 @@ const OrderManagement = () => {
       const mockOrders = generateMockOrders();
       setOrders(mockOrders);
       setLoading(false);
-      toast.success('Orders loaded successfully!');
+      
     }, 1000);
   }, []);
 

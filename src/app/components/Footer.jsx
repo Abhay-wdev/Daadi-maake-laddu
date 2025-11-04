@@ -26,7 +26,7 @@ const Footer = () => {
     const fetchProducts = async () => {
       try {
         const res = await fetch(
-          "https://dadimaabackend-1.onrender.com/api/products/all/?limit=100"
+          "https://dadimaabackend-2.onrender.com/api/products/all/?limit=100"
         );
         const data = await res.json();
 

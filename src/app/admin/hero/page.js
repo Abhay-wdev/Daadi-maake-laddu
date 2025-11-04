@@ -1,11 +1,31 @@
 'use client';
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import toast from 'react-hot-toast';
 
 // Configuration
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'https://dadimaabackend-1.onrender.com/api';
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'https://dadimaabackend-2.onrender.com/api';
 const IMAGE_UPLOAD_ENDPOINT = `${API_BASE_URL}/hero/upload`;
 const HERO_IMAGES_ENDPOINT = `${API_BASE_URL}/hero`;
+
+// Create axios instance with authorization interceptor
+const api = axios.create({
+  baseURL: API_BASE_URL,
+});
+
+// Add request interceptor to include authorization token
+api.interceptors.request.use(
+  (config) => {
+    const token = localStorage.getItem('token');
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+  },
+  (error) => {
+    return Promise.reject(error);
+  }
+);
 
 // Custom hook for API operations
 const useHeroImages = () => {
@@ -16,12 +36,13 @@ const useHeroImages = () => {
   const fetchHeroImages = async () => {
     try {
       setLoading(true);
-      const response = await axios.get(HERO_IMAGES_ENDPOINT);
+      const response = await api.get('/hero');
       setHeroImages(response.data);
       setError('');
     } catch (err) {
       setError('Failed to fetch hero images');
       console.error('Error fetching hero images:', err);
+      toast.error('Failed to fetch hero images');
     } finally {
       setLoading(false);
     }
@@ -29,23 +50,27 @@ const useHeroImages = () => {
 
   const deleteHeroImage = async (id) => {
     try {
-      await axios.delete(`${HERO_IMAGES_ENDPOINT}/${id}`);
+      await api.delete(`/hero/${id}`);
       setHeroImages(prev => prev.filter(img => img._id !== id));
+      toast.success('Hero image deleted successfully');
       return true;
     } catch (err) {
       setError('Failed to delete hero image');
       console.error('Error deleting hero image:', err);
+      toast.error('Failed to delete hero image');
       return false;
     }
   };
 
   const reorderHeroImages = async (updates) => {
     try {
-      await axios.put(`${HERO_IMAGES_ENDPOINT}/reorder`, { updates });
+      await api.put('/hero/reorder', { updates });
+      toast.success('Hero images reordered successfully');
       return true;
     } catch (err) {
       setError('Failed to reorder hero images');
       console.error('Error reordering hero images:', err);
+      toast.error('Failed to reorder hero images');
       return false;
     }
   };
@@ -377,19 +402,23 @@ const HeroImageManager = () => {
 
     try {
       if (editingImage) {
-        await axios.put(`${HERO_IMAGES_ENDPOINT}/${editingImage._id}`, data, {
+        await api.put(`/hero/${editingImage._id}`, data, {
           headers: { 'Content-Type': 'multipart/form-data' }
         });
+        toast.success('Hero image updated successfully');
       } else {
-        await axios.post(IMAGE_UPLOAD_ENDPOINT, data, {
+        await api.post('/hero/upload', data, {
           headers: { 'Content-Type': 'multipart/form-data' }
         });
+        toast.success('Hero image uploaded successfully');
       }
       
       resetForm();
       fetchHeroImages();
     } catch (err) {
-      setError(err.response?.data?.message || 'Operation failed');
+      const errorMessage = err.response?.data?.message || 'Operation failed';
+      setError(errorMessage);
+      toast.error(errorMessage);
       console.error('Error submitting form:', err);
     } finally {
       setLoading(false);
@@ -426,7 +455,7 @@ const HeroImageManager = () => {
     
     const success = await reorderHeroImages(updates);
     if (success) {
-      alert('Hero images reordered successfully');
+      // Success toast is already shown in reorderHeroImages
     }
   };
 
@@ -454,13 +483,6 @@ const HeroImageManager = () => {
     <div className="min-h-screen bg-gray-50 py-8">
       <div className="max-w-6xl mx-auto px-4">
         <h1 className="text-3xl font-bold text-gray-800 mb-8">Hero Images Management</h1>
-        
-        {/* Error Display */}
-        {(error || apiError) && (
-          <div className="bg-red-50 text-red-700 p-3 rounded mb-4">
-            {error || apiError}
-          </div>
-        )}
         
         {/* Form Section */}
         <HeroImageForm 

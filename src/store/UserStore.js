@@ -4,7 +4,7 @@ import { create } from "zustand";
 import api from "../app/admin/services/api";
 
 // Define base URL for API calls
-const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "https://dadimaabackend-1.onrender.com/api";
+const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "https://dadimaabackend-2.onrender.com/api";
 
 export const useAuthStore = create((set, get) => ({
   user: null,
@@ -17,43 +17,54 @@ export const useAuthStore = create((set, get) => ({
   // =========================================================
   // 🔹 LOGIN
   // =========================================================
- login: async (form, router) => {
+login: async (form, router) => {
   try {
-    set({ loading: true, message: "" });
-    const res = await api.post(`${BASE_URL}/user/login`, form);
+    set({ loading: true, message: "", error: "" });
 
-    if (res.data.success) {
-      const { token, user } = res.data;
-console.log("Login successful:", token);
-      // ✅ Save token & user info
+    const res = await api.post(`${BASE_URL}/user/login`, form);
+    const { success, token, user, message } = res.data;
+
+    if (success) {
+      console.log("✅ Login successful:", token);
+
+      // 🧠 Save essential data to localStorage
       localStorage.setItem("token", token);
       localStorage.setItem("user", JSON.stringify(user));
+      localStorage.setItem("userId", user._id);
 
-      // ✅ Save user ID separately for easy access
-      if (user?._id) {
-        localStorage.setItem("userId", user._id);
-      }
-
-      // ✅ Save default shipping address if exists
-      if (user?.address?._id) {
-        localStorage.setItem("createdAddressId", user.address._id);
+      // 🏠 Save address info if available
+      if (user?.shippingAddress?._id) {
+        localStorage.setItem("createdAddressId", user.shippingAddress._id);
       } else if (user?.addresses?.length > 0) {
-        const defaultAddr =
-          user.addresses.find((a) => a.isDefault) || user.addresses[0];
-        if (defaultAddr?._id) {
-          localStorage.setItem("createdAddressId", defaultAddr._id);
+        const defaultAddress =
+          user.addresses.find((addr) => addr.isDefault) || user.addresses[0];
+        if (defaultAddress?._id) {
+          localStorage.setItem("createdAddressId", defaultAddress._id);
         }
       }
 
-      // ✅ Optional: redirect after login
-      if (router) router.push("/");
-      
+      // 🧭 Redirect based on user role
+      if (router) {
+        if (user.role === "admin") {
+          router.push("/admin");
+        } else {
+          router.push("/");
+        }
+      }
+
       set({
         loading: false,
-        message: res.data.message || "Login successful",
+        message: message || "Login successful",
+        error: "",
+      });
+    } else {
+      set({
+        loading: false,
+        error: message || "Login failed",
       });
     }
   } catch (err) {
+    console.error("❌ Login Error:", err);
     set({
       loading: false,
       error: err.response?.data?.message || err.message,
@@ -62,12 +73,15 @@ console.log("Login successful:", token);
 },
 
 
+
+
   // =========================================================
   // 🔹 LOGOUT
   // =========================================================
   logout: (router) => {
     localStorage.removeItem("token");
     localStorage.removeItem("user");
+    localStorage.removeItem("userId");
     localStorage.removeItem("shippingAddressId");
     set({ user: null, token: null, message: "Logged out successfully" });
     router.push("/login");

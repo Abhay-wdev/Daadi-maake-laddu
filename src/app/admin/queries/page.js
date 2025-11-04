@@ -21,7 +21,7 @@ import {
   ChevronUp,
 } from "lucide-react";
 
-const API_BASE = "https://dadimaabackend-1.onrender.com/api/contact";
+const API_BASE = "https://dadimaabackend-2.onrender.com/api/contact";
 
 export default function ContactSystem() {
   const router = useRouter();
@@ -425,7 +425,7 @@ export default function ContactSystem() {
 
       {/* Reply Modal */}
       {isModalOpen && currentQuery && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+        <div className="fixed inset-0 bg-black/50  flex items-center justify-center p-4 z-50">
           <div className="bg-white border-2 border-amber-600 rounded-xl shadow-xl max-w-2xl w-full max-h-[90vh] overflow-hidden flex flex-col">
             <div className="px-6 py-4 border-b border-gray-200 flex justify-between items-center">
               <h3 className="text-xl font-bold text-gray-800">

@@ -1,6 +1,6 @@
 "use client";
 import React, { useState, useEffect } from "react";
-import toast,{Toaster} from "react-hot-toast";
+import toast  from "react-hot-toast";
 
 export default function BlogForm({ initialData, onSubmit }) {
   const [form, setForm] = useState(

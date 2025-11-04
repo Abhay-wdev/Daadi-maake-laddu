@@ -43,7 +43,7 @@ export default function CreateBlog() {
 
       if (form.image) fd.append("image", form.image);
 
-      const res = await fetch("https://dadimaabackend-1.onrender.com/api/blogs", {
+      const res = await fetch("https://dadimaabackend-2.onrender.com/api/blogs", {
         method: "POST",
         headers: {
           Authorization: `Bearer ${token}`, // ✅ secure token header
@@ -54,7 +54,7 @@ export default function CreateBlog() {
       const data = await res.json();
 
       if (res.ok && data.success) {
-        alert("✅ Blog created successfully!");
+        
         router.push("/admin/blogs"); // redirect after success
       } else {
         alert("❌ Failed: " + (data.message || "Unknown error"));

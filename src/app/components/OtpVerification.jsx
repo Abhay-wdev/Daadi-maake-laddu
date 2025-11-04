@@ -6,23 +6,40 @@ import { useRouter } from "next/navigation";
 const OtpVerification = ({ formData, setStep }) => {
   const [otp, setOtp] = useState("");
   const [message, setMessage] = useState("");
+  const [loading, setLoading] = useState(false);
   const router = useRouter();
 
   const handleVerify = async (e) => {
     e.preventDefault();
+    setLoading(true);
+    setMessage("");
 
     try {
-      const res = await axios.post("https://dadimaabackend-1.onrender.com/auth/verify-otp", {
+      const res = await axios.post("https://dadimaabackend-2.onrender.com/auth/verify-otp", {
         ...formData,
         otp,
       });
 
-      if (res.status === 201) {
-        setMessage("✅ Account created! Redirecting to login...");
-        setTimeout(() => router.push("/login"), 1500);
+      if (res.data.success) {
+        const { token, user } = res.data;
+
+        // ✅ Save all important data to localStorage
+        localStorage.setItem("token", token);
+        localStorage.setItem("user", JSON.stringify(user));
+        localStorage.setItem("userId", user._id);
+
+        setMessage("🎉 Registration successful! Redirecting...");
+
+        // ✅ Redirect to home or dashboard after delay
+        setTimeout(() => router.push("/"), 1500);
+      } else {
+        setMessage(res.data.message || "Verification failed");
       }
     } catch (err) {
+      console.error("❌ OTP Verification Error:", err);
       setMessage(err.response?.data?.message || "Invalid or expired OTP");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -38,14 +55,19 @@ const OtpVerification = ({ formData, setStep }) => {
           value={otp}
           onChange={(e) => setOtp(e.target.value)}
           required
-          className="w-full border px-3 py-2 rounded-md text-center tracking-widest text-lg"
+          className="w-full border px-3 py-2 rounded-md text-center tracking-widest text-lg focus:ring-2 focus:ring-indigo-500"
         />
 
         <button
           type="submit"
-          className="w-full bg-green-600 text-white py-2 rounded-md hover:bg-green-700 transition"
+          disabled={loading}
+          className={`w-full py-2 rounded-md transition ${
+            loading
+              ? "bg-gray-400 cursor-not-allowed"
+              : "bg-green-600 hover:bg-green-700 text-white"
+          }`}
         >
-          Verify OTP
+          {loading ? "Verifying..." : "Verify OTP"}
         </button>
       </form>
 
@@ -57,7 +79,7 @@ const OtpVerification = ({ formData, setStep }) => {
       </button>
 
       {message && (
-        <p className="mt-3 text-center text-sm text-gray-600">{message}</p>
+        <p className="mt-3 text-center text-sm text-gray-700">{message}</p>
       )}
     </div>
   );

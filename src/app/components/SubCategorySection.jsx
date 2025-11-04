@@ -12,7 +12,7 @@ const SubCategorySection = () => {
   useEffect(() => {
     const fetchSubcategories = async () => {
       try {
-        const res = await fetch("https://dadimaabackend-1.onrender.com/api/subcategories");
+        const res = await fetch("https://dadimaabackend-2.onrender.com/api/subcategories");
         const data = await res.json();
 
         const list = Array.isArray(data)

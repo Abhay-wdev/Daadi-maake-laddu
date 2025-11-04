@@ -3,7 +3,7 @@ import axios from "axios";
 import toast from "react-hot-toast";
 
 const api = axios.create({
-  baseURL: "https://dadimaabackend-1.onrender.com/api/products",
+  baseURL: "https://dadimaabackend-2.onrender.com/api/products",
 });
 
 // Attach JWT token automatically
