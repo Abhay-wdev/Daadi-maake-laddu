@@ -102,7 +102,7 @@ const SubCategorySection = () => {
                 src={sub.image}
                 alt={sub.name}
                 fill
-                className="object-contain border transition-transform duration-700 ease-out group-hover:scale-110 drop-shadow-md"
+                className="object-contain  rounded-2xl border transition-transform duration-700 ease-out group-hover:scale-110 drop-shadow-md"
               />
             </div>
 
