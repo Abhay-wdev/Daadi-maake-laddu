@@ -4,22 +4,26 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { FaHome, FaChevronLeft, FaTimes } from "react-icons/fa";
 import { LuComponent } from "react-icons/lu";
-
+import { FaBuildingFlag } from "react-icons/fa6";
+import { FaUsers } from "react-icons/fa";
+import { PiCardsThreeFill } from "react-icons/pi";
+import { FaBlogger } from "react-icons/fa";
+import { FaPersonCircleQuestion } from "react-icons/fa6";
 export default function Sidebar({ open, collapsed, setCollapsed, setSidebarOpen }) {
   const pathname = usePathname();
 
   const navItems = [
      
        
-     { label: "Quiries", path: "/admin/queries", icon: <LuComponent /> },
+     { label: "Quiries", path: "/admin/queries", icon: <FaPersonCircleQuestion /> },
    
-     { label: "Blogs", path: "/admin/blogs", icon: <LuComponent /> },
-    { label: "Hero Section", path: "/admin/hero", icon: <LuComponent /> },
+     { label: "Blogs", path: "/admin/blogs", icon: <FaBlogger /> },
+    { label: "Hero Section", path: "/admin/hero", icon: <PiCardsThreeFill /> },
     
     
     { label: "Category", path: "/admin/category", icon:  <LuComponent /> },
-    { label: "Users", path: "/admin/users", icon: <LuComponent /> },
-    { label: "Company", path: "/admin/company", icon: <LuComponent /> },
+    { label: "Users", path: "/admin/users", icon: <FaUsers /> },
+    { label: "Company", path: "/admin/company", icon: <FaBuildingFlag /> },
     // Add more items here
   ];
 

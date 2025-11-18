@@ -6,7 +6,7 @@ import { usePathname } from "next/navigation";
 import NotificationDropdown from "./NotificationDropdown";
 import UserDropdown from "./UserDropdown";
 import ProfileIcon from "@/app/components/ProfileIcon";
-
+import { FaBuildingFlag } from "react-icons/fa6";
 export default function Header({ setSidebarOpen }) {
   const pathname = usePathname();
   const [showNotifications, setShowNotifications] = useState(false);
@@ -70,16 +70,7 @@ export default function Header({ setSidebarOpen }) {
       {/* Right Side: Notification + User */}
       <div className="flex items-center gap-4 relative">
         {/* Notification Bell */}
-        <div className="relative" ref={bellRef}>
-          <button
-            onClick={toggleNotifications}
-            className="p-2 rounded-full hover:bg-gray-200 transition relative"
-          >
-            <FaBell className="text-xl text-gray-800" />
-            <span className="absolute top-2 right-2 w-2 h-2 bg-primary rounded-full"></span>
-          </button>
-          {showNotifications && <NotificationDropdown onClose={() => setShowNotifications(false)} />}
-        </div>
+        
 
         {/* User Avatar */}
         <div className="relative"  >

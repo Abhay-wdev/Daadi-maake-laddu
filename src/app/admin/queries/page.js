@@ -21,7 +21,7 @@ import {
   ChevronUp,
 } from "lucide-react";
 
-const API_BASE = "https://dadimaabackend-2.onrender.com/api/contact";
+const API_BASE = `${process.env.NEXT_PUBLIC_API_BASE_URL}/contact`;
 
 export default function ContactSystem() {
   const router = useRouter();
@@ -228,7 +228,7 @@ export default function ContactSystem() {
             {message.type === "success" ? (
               <CheckCircle className="w-5 h-5" />
             ) : (
-              <AlertCircle className="w-5 h-5" />
+              <LinklertCircle className="w-5 h-5" />
             )}
             <span>{message.text}</span>
           </div>

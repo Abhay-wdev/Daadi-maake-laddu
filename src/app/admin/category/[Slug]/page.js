@@ -118,10 +118,12 @@ export default function SubCategoryPage() {
     setShowForm(false);
   };
 
-  const filteredSubCategories = subCategories.filter(sub =>
-    sub.name.toLowerCase().includes(searchTerm.toLowerCase())
-  );
-console.log("Filtered Subcategories:", filteredSubCategories);
+ const filteredSubCategories = subCategories.filter((sub) => {
+  const subName = sub?.name || "";
+  return subName.toLowerCase().includes(searchTerm.toLowerCase());
+});
+
+ 
   return (
     <div className="min-h-screen bg-gray-50 p-6">
       <Toaster position="top-right" reverseOrder={false} /> {/* <-- Toaster container */}

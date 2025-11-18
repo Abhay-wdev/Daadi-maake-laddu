@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 
 // Base URL for API
-const BASE_URL = 'https://dadimaabackend-2.onrender.com/api';
+const BASE_URL = '${process.env.NEXT_PUBLIC_API_BASE_URL}';
 
 // Order Management Component
 const OrderManagement = () => {

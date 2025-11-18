@@ -2,9 +2,10 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import toast from 'react-hot-toast';
+import Link from 'next/link';
 
 // Configuration
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'https://dadimaabackend-2.onrender.com/api';
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 const IMAGE_UPLOAD_ENDPOINT = `${API_BASE_URL}/hero/upload`;
 const HERO_IMAGES_ENDPOINT = `${API_BASE_URL}/hero`;
 
@@ -276,14 +277,14 @@ const HeroImageCard = ({
       <div className="p-4">
         <div className="mb-3">
           <p className="text-sm text-gray-500">Link:</p>
-          <a 
+         <Link
             href={image.link} 
             target="_blank" 
             rel="noopener noreferrer"
             className="text-blue-600 hover:text-blue-800 text-sm break-all"
           >
             {image.link}
-          </a>
+          </Link>
         </div>
         
         <div className="flex justify-between items-center">

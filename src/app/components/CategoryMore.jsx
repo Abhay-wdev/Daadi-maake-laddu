@@ -17,7 +17,7 @@ const ProductMore = ({ params }) => {
     const fetchData = async () => {
       try {
         const res = await fetch(
-          "https://dadimaabackend-2.onrender.com/api/products/all"
+          `${process.env.NEXT_PUBLIC_API_BASE_URL}/products/all`
         );
         const data = await res.json();
 
@@ -121,7 +121,7 @@ const ProductMore = ({ params }) => {
               <div className="flex justify-between">
                 <span className="text-gray-600">Allergens</span>
                 <span className="font-medium flex items-center text-gray-800">
-                  <AlertTriangle className="w-4 h-4 text-red-500 mr-1" />
+                  <LinklertTriangle className="w-4 h-4 text-red-500 mr-1" />
                   {product.allergenInfo}
                 </span>
               </div>

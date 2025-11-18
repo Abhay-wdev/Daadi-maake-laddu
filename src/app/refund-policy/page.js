@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import React from 'react';
 
 const RefundPolicy = () => {
@@ -130,23 +131,23 @@ const RefundPolicy = () => {
           <ul className="space-y-2">
             <li className="flex items-center">
               <span className="font-medium w-24">Website:</span>
-              <a 
+               <Link
                 href="http://www.dadimaakeladdu.com" 
                 className="font-medium"
                 style={{ color: mainColor }}
               >
                 www.dadimaakeladdu.com
-              </a>
+              </Link>
             </li>
             <li className="flex items-center">
               <span className="font-medium w-24">Email:</span>
-              <a 
+              <Link
                 href="mailto:info@dadimaakeladdu.com" 
                 className="font-medium"
                 style={{ color: mainColor }}
               >
                 info@dadimaakeladdu.com
-              </a>
+              </Link>
             </li>
           </ul>
         </section>

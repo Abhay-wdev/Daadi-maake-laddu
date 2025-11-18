@@ -15,7 +15,7 @@ const OtpVerification = ({ formData, setStep }) => {
     setMessage("");
 
     try {
-      const res = await axios.post("https://dadimaabackend-2.onrender.com/auth/verify-otp", {
+      const res = await axios.post(`${process.env.NEXT_PUBLIC_API_BASE_URL}/auth/verify-otp`, {
         ...formData,
         otp,
       });

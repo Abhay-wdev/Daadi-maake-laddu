@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import React from 'react';
 
 const CancellationPolicy = () => {
@@ -49,13 +50,13 @@ const CancellationPolicy = () => {
               <h3 className="font-medium text-lg mb-2">Cancellation Process</h3>
               <p className="leading-relaxed">
                 To request an order cancellation, please contact our customer support team via email at 
-                <a 
+                 <Link
                   href="mailto:info@dadimaakeladdu.com" 
                   className="font-medium"
                   style={{ color: mainColor }}
                 >
                   info@dadimaakeladdu.com
-                </a> 
+                 </Link>
                 or through our website's contact form. Please provide your order details and reason for cancellation.
               </p>
             </div>
@@ -131,23 +132,23 @@ const CancellationPolicy = () => {
           <ul className="space-y-2">
             <li className="flex items-center">
               <span className="font-medium w-24">Website:</span>
-              <a 
+               <Link
                 href="http://www.dadimaakeladdu.com" 
                 className="font-medium"
                 style={{ color: mainColor }}
               >
                 www.dadimaakeladdu.com
-              </a>
+              </Link>
             </li>
             <li className="flex items-center">
               <span className="font-medium w-24">Email:</span>
-              <a 
+              <Link
                 href="mailto:info@dadimaakeladdu.com" 
                 className="font-medium"
                 style={{ color: mainColor }}
               >
                 info@dadimaakeladdu.com
-              </a>
+              </Link>
             </li>
           </ul>
         </section>

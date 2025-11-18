@@ -44,9 +44,8 @@ const ProductDetails = ({ product }) => {
   const { cart, addItem, updateItem, removeItem, fetchCart, loading: cartLoading } = useCartStore();
   
   // User credentials - should be replaced with actual authentication
-  const userId = "68ea79bdf93f9fc8daed29a3";
-  const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2OGYxZWZmYjg2NDBlZGE5MDJkZWU2ZDIiLCJpYXQiOjE3NjEzOTM2NjcsImV4cCI6MTc2MTk5ODQ2N30.CJPFe65v-LpS5CuI4a7DjXVgO00Y3tDIGj5T1nZSK9c";
-
+const userId = typeof window !== "undefined" ? localStorage.getItem("userId") : null;
+const token = typeof window !== "undefined" ? localStorage.getItem("token") : null;
   // Check if product is in cart
   const isInCart = (productId) =>
     cart?.items?.some((item) => item.product._id === productId);
@@ -509,7 +508,7 @@ const ProductDetails = ({ product }) => {
         <div className="flex items-start text-sm">
           <span className="text-gray-600 w-24">Ingredients</span>
           <span className="font-medium flex items-center">
-            <AlertTriangle className="w-4 h-4 text-green-500 mr-1" />
+            <LinklertTriangle className="w-4 h-4 text-green-500 mr-1" />
             {product.allergenInfo}
           </span>
         </div>

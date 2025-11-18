@@ -26,7 +26,7 @@ const Footer = () => {
     const fetchProducts = async () => {
       try {
         const res = await fetch(
-          "https://dadimaabackend-2.onrender.com/api/products/all/?limit=100"
+          `${process.env.NEXT_PUBLIC_API_BASE_URL}/products/all/?limit=100`
         );
         const data = await res.json();
 
@@ -169,28 +169,28 @@ const Footer = () => {
               </div>
               <div className="flex items-center">
                 <Phone className="w-5 h-5 mr-3 flex-shrink-0" />
-                <a
+                <Link
                   href="tel:+919461677122"
                   className="text-sm hover:text-white transition-colors duration-300"
                 >
                   +91 9461677122
-                </a>
+                </Link>
                 ,&nbsp;
-                <a
+                <Link
                   href="tel:+918949342270"
                   className="text-sm hover:text-white transition-colors duration-300"
                 >
                   +91 8949342270
-                </a>
+                </Link>
               </div>
               <div className="flex items-center">
                 <Mail className="w-5 h-5 mr-3 flex-shrink-0" />
-                <a
+                <Link
                   href="mailto:info@seocialmedia.in"
                   className="text-sm hover:text-white transition-colors duration-300"
                 >
                   info@seocialmedia.in
-                </a>
+                </Link>
               </div>
             </div>
           </div>

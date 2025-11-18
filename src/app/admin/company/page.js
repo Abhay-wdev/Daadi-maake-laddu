@@ -3,8 +3,9 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import toast from 'react-hot-toast';
+import Link from 'next/link';
 
-const API_BASE = "https://dadimaabackend-2.onrender.com/api/company";
+const API_BASE = `${process.env.NEXT_PUBLIC_API_BASE_URL}/company`;
 
 export default function CompanyManagement() {
   const [companies, setCompanies] = useState([]);
@@ -412,14 +413,14 @@ export default function CompanyManagement() {
                         {company.website && (
                           <p className="text-sm text-gray-600">
                             <span className="font-medium">Website:</span>{" "}
-                            <a
+                            <Link
                               href={company.website}
                               target="_blank"
                               rel="noopener noreferrer"
                               className="text-blue-600 hover:underline"
                             >
                               {company.website}
-                            </a>
+                            </Link>
                           </p>
                         )}
                       </div>
@@ -448,7 +449,7 @@ export default function CompanyManagement() {
                           <div className="flex flex-wrap gap-2 mt-1">
                             {company.socialLinks.map((social, idx) => (
                               social.link && (
-                                <a
+                                <Link
                                   key={idx}
                                   href={social.link}
                                   target="_blank"
@@ -463,7 +464,7 @@ export default function CompanyManagement() {
                                     />
                                   )}
                                   <span>{social.social}</span>
-                                </a>
+                                </Link>
                               )
                             ))}
                           </div>

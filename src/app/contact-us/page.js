@@ -1,5 +1,6 @@
 "use client";
 import React, { useState } from "react";
+import Link from "next/link";
 import {
   FaFacebookF,
   FaInstagram,
@@ -28,7 +29,7 @@ export default function Contact() {
     setLoading(true);
 
     try {
-      const res = await fetch("https://dadimaabackend-2.onrender.com/api/contact", {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/contact`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(form),
@@ -201,13 +202,13 @@ export default function Contact() {
 // ✅ Small helper for social icons
 function SocialIcon({ Icon, link }) {
   return (
-    <a
+    <Link
       href={link}
       target="_blank"
       rel="noopener noreferrer"
       className="bg-[#BB4D00] text-white p-3 rounded-full hover:bg-[#a03f00] transition-transform transform hover:scale-110"
     >
       <Icon size={20} />
-    </a>
+    </Link>
   );
 }

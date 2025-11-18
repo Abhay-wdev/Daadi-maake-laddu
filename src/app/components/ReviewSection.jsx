@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { ChevronLeft, ChevronRight } from "lucide-react";
-
+import Link from "next/link";
 const testimonials = [
   {
     name: "Aarohi Mehta",
@@ -47,7 +47,7 @@ const ReviewSection = () => {
   return (
     <div className="relative flex flex-col items-center justify-center p-10 md:p-16 w-full bg-gradient-to-br from-amber-800 via-amber-700   text-white overflow-hidden">
       {/* Logo */}
-      <a
+      <Link
         className="mb-8 md:mb-12 hover:opacity-80 transition"
         href="https://dadimaakeladdu.com"
         target="_blank"
@@ -58,7 +58,7 @@ const ReviewSection = () => {
           src="/images/logo.webp"
           alt="Dadimaa Ke Laddu Logo"
         />
-      </a>
+      </Link>
 
       {/* Left Arrow */}
       <button

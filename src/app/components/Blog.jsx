@@ -53,7 +53,7 @@ const Blog = () => {
   useEffect(() => {
     const fetchBlogs = async () => {
       try {
-        const res = await fetch("https://dadimaabackend-2.onrender.com/api/blogs");
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/blogs`);
         const data = await res.json();
         if (data.success) setBlogs(data.data);
       } catch (error) {

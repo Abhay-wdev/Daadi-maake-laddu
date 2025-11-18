@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import React from 'react';
 
 const PrivacyPolicy = () => {
@@ -29,8 +30,8 @@ const PrivacyPolicy = () => {
         <h2 style={{ color: mainColor }}>Contact Information</h2>
         <p>If you have any questions or concerns regarding this Privacy Policy, please feel free to reach out to us:</p>
         <ul style={{ paddingLeft: '20px' }}>
-          <li>Website: <a href="http://www.dadimaakeladdu.com" style={{ color: mainColor }}>www.dadimaakeladdu.com</a></li>
-          <li>Email: <a href="mailto:info@dadimaakeladdu.com" style={{ color: mainColor }}>info@dadimaakeladdu.com</a></li>
+          <li>Website:   <Link href="http://www.dadimaakeladdu.com" style={{ color: mainColor }}>www.dadimaakeladdu.com</Link></li>
+          <li>Email:  <Link href="mailto:info@dadimaakeladdu.com" style={{ color: mainColor }}>info@dadimaakeladdu.com</Link></li>
         </ul>
       </section>
 
@@ -109,7 +110,7 @@ const PrivacyPolicy = () => {
       <section style={{ marginBottom: '25px' }}>
         <h2 style={{ color: mainColor }}>Conclusion</h2>
         <p>
-          Thank you for trusting Dadi Maa Ke Laddu with your personal information. We are dedicated to maintaining transparency and complying with Indian data protection laws. If you have any questions or need further clarification, please contact us at <a href="mailto:info@dadimaakeladdu.com" style={{ color: mainColor }}>info@dadimaakeladdu.com</a>. Your satisfaction and privacy are of paramount importance to us, and we are committed to upholding these standards throughout your online bakery experience.
+          Thank you for trusting Dadi Maa Ke Laddu with your personal information. We are dedicated to maintaining transparency and complying with Indian data protection laws. If you have any questions or need further clarification, please contact us at <Link href="mailto:info@dadimaakeladdu.com" style={{ color: mainColor }}>info@dadimaakeladdu.com</Link>. Your satisfaction and privacy are of paramount importance to us, and we are committed to upholding these standards throughout your online bakery experience.
         </p>
       </section>
 

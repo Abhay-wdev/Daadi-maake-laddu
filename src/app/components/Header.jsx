@@ -78,7 +78,7 @@ const Header = () => {
 
         // Fetch from API if no local data found
         const res = await fetch(
-          "https://dadimaabackend-2.onrender.com/api/products/all/?limit=100"
+          `${process.env.NEXT_PUBLIC_API_BASE_URL}/products/all/?limit=100`
         );
         const data = await res.json();
 
@@ -129,7 +129,7 @@ const Header = () => {
 
   const QuickContactButtons = () => (
     <div className="flex items-center gap-2 sm:gap-3">
-      <a
+      <Link
         href="tel:+916378362945"
         className="flex items-center justify-center w-9 h-9 sm:w-10 sm:h-10 bg-gradient-to-r from-green-400 to-green-500 
                  rounded-full hover:from-green-500 hover:to-green-600 transition-all duration-300 shadow-md hover:shadow-lg
@@ -137,8 +137,8 @@ const Header = () => {
         aria-label="Call us"
       >
         <Phone size={18} className="text-white sm:w-5 sm:h-5" />
-      </a>
-      <a
+      </Link>
+      <Link
         href="https://wa.me/+916378362945"
         target="_blank"
         rel="noreferrer"
@@ -148,7 +148,7 @@ const Header = () => {
         aria-label="WhatsApp us"
       >
         <FaWhatsapp size={18} className="text-white sm:w-5 sm:h-5" />
-      </a>
+      </Link>
     </div>
   );
 

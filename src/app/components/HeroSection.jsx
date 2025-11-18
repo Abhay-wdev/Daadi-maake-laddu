@@ -1,11 +1,11 @@
 "use client";
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-
+import Link from "next/link";
 // Configuration
 const API_BASE_URL =
   process.env.NEXT_PUBLIC_API_URL ||
-  "https://dadimaabackend-2.onrender.com/api";
+  `${process.env.NEXT_PUBLIC_API_BASE_URL}`;
 const HERO_IMAGES_ENDPOINT = `${API_BASE_URL}/hero`;
 
 const HeroSection = () => {
@@ -121,7 +121,7 @@ const HeroSection = () => {
               index === currentIndex ? "opacity-100" : "opacity-0"
             }`}
           >
-            <a
+            <Link
               href={image.link}
               target="_blank"
               rel="noopener noreferrer"
@@ -134,7 +134,7 @@ const HeroSection = () => {
               />
                
                
-            </a>
+            </Link>
           </div>
         ))}
       </div>
@@ -148,7 +148,7 @@ const HeroSection = () => {
               index === currentIndex ? "opacity-100" : "opacity-0"
             }`}
           >
-            <a
+            <Link
               href={image.link}
               target="_blank"
               rel="noopener noreferrer"
@@ -161,7 +161,7 @@ const HeroSection = () => {
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent"></div>
                
-            </a>
+            </Link>
           </div>
         ))}
       </div>

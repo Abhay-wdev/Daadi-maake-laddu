@@ -25,7 +25,7 @@ const SignupForm = () => {
     }
 
     try {
-      const res = await axios.post("https://dadimaabackend-2.onrender.com/auth/send-otp", {
+      const res = await axios.post(`${process.env.NEXT_PUBLIC_API_BASE_URL}/auth/send-otp`, {
         email: form.email,
       });
       if (res.status === 200) {

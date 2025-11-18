@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useAuthStore } from "../../store/UserStore";
+import Link from "next/link";
 import {
   FaUser,
   FaLock,
@@ -10,14 +11,14 @@ import {
   FaArrowRight,
   FaTimes,
 } from "react-icons/fa";
-import toast, { Toaster } from "react-hot-toast";
+import toast from "react-hot-toast";
 
 export default function LoginForm() {
   const [form, setForm] = useState({ email: "", password: "" });
   const [attempts, setAttempts] = useState(0);
 
   const router = useRouter();
-  const { login, message, loading } = useAuthStore();
+  const { login, message, error, loading } = useAuthStore();
 
   // ----------------------------
   // HANDLE INPUT CHANGE
@@ -39,7 +40,6 @@ export default function LoginForm() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Basic validation
     if (!form.email || !form.password) {
       toast.error("Please fill in all fields");
       return;
@@ -55,15 +55,9 @@ export default function LoginForm() {
       return;
     }
 
-    // Attempt login
     const result = await login(form, router);
 
-    // Detect failed login by checking message or result
-    if (
-      !result ||
-      (message && message.toLowerCase().includes("failed")) ||
-      (result?.error && result.error.includes("failed"))
-    ) {
+    if (!result?.success) {
       setAttempts((prev) => prev + 1);
 
       if (attempts + 1 === 2) {
@@ -73,36 +67,33 @@ export default function LoginForm() {
         });
       }
     } else {
-      // Reset attempts on success
       setAttempts(0);
     }
   };
 
   // ----------------------------
-  // TOAST MESSAGES (SUCCESS/ERROR)
+  // TOAST MESSAGES
   // ----------------------------
   useEffect(() => {
-    if (!message) return;
-
-    const msg = message.toLowerCase();
-    if (msg.includes("failed") || msg.includes("error")) {
-      toast.error(message, {
+    if (error) {
+      toast.error(error, {
         duration: 4000,
         icon: <FaTimes className="text-red-500" />,
       });
-    } else {
+    }
+    if (message) {
       toast.success(message);
     }
-  }, [message]);
+  }, [message, error]);
 
   // ----------------------------
   // RENDER UI
   // ----------------------------
   return (
     <div className="max-w-md mx-auto mt-16 p-1">
-      <Toaster position="top-center" />
 
       <div className="bg-gradient-to-br from-amber-50 to-amber-100 rounded-2xl shadow-xl p-8 border border-amber-200">
+
         {/* Header */}
         <div className="text-center mb-8">
           <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-amber-700 mb-4">
@@ -115,6 +106,7 @@ export default function LoginForm() {
         {/* Login Form */}
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="space-y-4">
+
             {/* Email Field */}
             <div className="relative">
               <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -215,16 +207,16 @@ export default function LoginForm() {
           </div>
         )}
 
-        {/* Sign Up Link */}
+        {/* Sign Up */}
         <div className="mt-8 pt-6 border-t border-amber-200 text-center">
           <span className="text-amber-700">Don&apos;t have an account? </span>
-          <a
+          <Link
             href="/signup"
             className="inline-flex items-center text-amber-700 hover:text-amber-800 font-semibold transition-colors duration-300"
           >
             Sign Up
             <FaArrowRight className="ml-1 text-xs" />
-          </a>
+          </Link>
         </div>
       </div>
     </div>
