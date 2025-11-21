@@ -21,7 +21,17 @@ const Footer = () => {
     window.scrollTo(0, 0);
   }, [pathname]);
 
-  // ✅ Fetch subcategories grouped by subCategory name
+  // 🔥 Slug converter (handles spaces, apostrophes, special characters)
+  const toSlug = (text) => {
+    return text
+      .toLowerCase()
+      .replace(/'/g, "")             // remove apostrophes
+      .replace(/[^a-z0-9\s-]/g, "")  // remove other special chars
+      .replace(/\s+/g, "-")          // spaces → hyphens
+      .trim();
+  };
+
+  // Fetch all products → extract unique subCategories
   useEffect(() => {
     const fetchProducts = async () => {
       try {
@@ -30,21 +40,22 @@ const Footer = () => {
         );
         const data = await res.json();
 
-        // Group products by subCategory name
         const grouped = {};
+
         data.products.forEach((product) => {
           const subCatName = product.subCategory?.name || "Others";
+
           if (!grouped[subCatName]) grouped[subCatName] = [];
+
           grouped[subCatName].push({
             title: product.name,
             href: `/products/${product.slug}`,
           });
         });
 
-        // Convert grouped into an array of subCategory items
         const subCategoryMenu = Object.keys(grouped).map((subCatName) => ({
           name: subCatName,
-          href: `/products/?subCategory=${encodeURIComponent(subCatName.toLowerCase())}`,
+          href: `/products/?subCategory=${toSlug(subCatName)}`,
         }));
 
         setSubCategories(subCategoryMenu);
@@ -79,6 +90,7 @@ const Footer = () => {
     <footer className="bg-[#943900] text-gray-300">
       <div className="max-w-7xl mx-auto px-4 py-12 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12">
+
           {/* Company Info */}
           <div className="space-y-6">
             <Image
@@ -89,11 +101,12 @@ const Footer = () => {
               className="h-23 w-auto"
             />
             <p className="text-sm leading-relaxed">
-              Our handmade product ranges from Healthy Laddu’s, Panjeeri, Pre &
-              Post Pregnancy Complete Dietary Care, etc. aiming to provide
+              Our handmade product ranges from Healthy Laddu’s, Panjeeri,
+              Pre & Post Pregnancy Complete Dietary Care, etc. aiming to provide
               healthy & a balanced diet to every generation. Dadi Maa Ke Laddu
               is a registered brand by <b>AVYAN ENTERPRISES</b>
             </p>
+
             <div className="flex space-x-4">
               {socialLinks.map((social) => (
                 <Link
@@ -130,7 +143,7 @@ const Footer = () => {
             </ul>
           </div>
 
-          {/* Product Categories (Dynamic from API) */}
+          {/* Product Categories */}
           <div>
             <h3 className="text-lg font-semibold text-white mb-6">
               Product Categories
@@ -163,39 +176,50 @@ const Footer = () => {
               <div className="flex items-start">
                 <MapPin className="w-5 h-5 mr-3 mt-1 flex-shrink-0" />
                 <p className="text-sm">
-                 M-251
-Opp Vishwanath 
-Parag road 
-Ashiyana lucknow- 226012
+                  M-251  
+                  Opp Vishwanath  
+                  Parag Road  
+                  Ashiyana, Lucknow - 226012
                 </p>
               </div>
+
               <div className="flex items-center">
                 <Phone className="w-5 h-5 mr-3 flex-shrink-0" />
                 <Link
                   href="tel:+917800165704"
                   className="text-sm hover:text-white transition-colors duration-300"
                 >
-                +91 78001 65704
+                  +91 78001 65704
                 </Link>
-                 
-              
               </div>
+
               <div className="flex items-center">
                 <Mail className="w-5 h-5 mr-3 flex-shrink-0" />
                 <Link
-                  href="mailto: info@dadimaakeladdu.com"
+                  href="mailto:info@dadimaakeladdu.com"
                   className="text-sm hover:text-white transition-colors duration-300"
                 >
-                   info@dadimaakeladdu.com
+                  info@dadimaakeladdu.com
                 </Link>
               </div>
             </div>
           </div>
+
         </div>
 
         {/* Copyright */}
         <div className="mt-12 pt-8 border-t border-gray-200 text-center">
-          <p className="text-sm text-gray-200">© {currentYear} Developed<a className="cursor-pointer text-green-50  hover:font-bold" href="https://viralnexus.in/"> VIRAL nexus.</a> All rights reserved.</p>
+          <p className="text-sm text-gray-200">
+            © {currentYear} Developed by{" "}
+            <a
+              className="cursor-pointer text-green-50 hover:font-bold"
+              href="https://viralnexus.in/"
+              target="_blank"
+            >
+              VIRAL nexus.
+            </a>{" "}
+            All rights reserved.
+          </p>
         </div>
       </div>
     </footer>
