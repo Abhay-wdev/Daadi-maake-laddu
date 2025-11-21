@@ -39,8 +39,6 @@ export default function SignupForm() {
 
     if (res?.success) {
       toast.success(res.message || "OTP sent successfully!");
-    } else {
-      toast.error(res?.message || "Failed to send OTP.");
     }
   };
 
