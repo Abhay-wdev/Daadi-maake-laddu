@@ -508,7 +508,7 @@ const token = typeof window !== "undefined" ? localStorage.getItem("token") : nu
         <div className="flex items-start text-sm">
           <span className="text-gray-600 w-24">Ingredients</span>
           <span className="font-medium flex items-center">
-            <LinklertTriangle className="w-4 h-4 text-green-500 mr-1" />
+            <AlertTriangle className="w-4 h-4 text-green-500 mr-1" />
             {product.allergenInfo}
           </span>
         </div>

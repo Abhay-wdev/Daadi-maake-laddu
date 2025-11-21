@@ -3,6 +3,7 @@ import React, { useEffect, useState } from "react";
 import Image from "next/image";
 import { Clock, Package, Share2, AlertTriangle } from "lucide-react";
 import { useRouter } from "next/navigation";
+ 
 
 const ProductMore = ({ params }) => {
   const router = useRouter();
@@ -121,7 +122,7 @@ const ProductMore = ({ params }) => {
               <div className="flex justify-between">
                 <span className="text-gray-600">Allergens</span>
                 <span className="font-medium flex items-center text-gray-800">
-                  <LinklertTriangle className="w-4 h-4 text-red-500 mr-1" />
+                  <AlertTriangle className="w-4 h-4 text-red-500 mr-1" />
                   {product.allergenInfo}
                 </span>
               </div>
