@@ -107,10 +107,13 @@ export default function Contact() {
 
           <div className="space-y-3 mt-4">
             <p>
-              📍 <strong>Address:</strong> 123 Healthy Street, Jaipur, Rajasthan, India
+              📍 <strong>Address:</strong> M-251
+Opp Vishwanath 
+Parag road 
+Ashiyana lucknow- 226012
             </p>
             <p>
-              📞 <strong>Phone:</strong> +91 98765 43210
+              📞 <strong>Phone:</strong>+91 78001 65704
             </p>
             <p>
               📧 <strong>Email:</strong> info@dadimaaladdu.com
@@ -215,7 +218,7 @@ export default function Contact() {
         <div className="w-full h-[400px] md:h-[500px]">
           <iframe
             title="Our Location"
-            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3559.229648062513!2d75.78727087543189!3d26.861477476680857!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x396db6f33f266ccf%3A0x48b7f56f9c2b6e50!2sJaipur%2C%20Rajasthan%2C%20India!5e0!3m2!1sen!2sin!4v1698672566643!5m2!1sen!2sin"
+            src="https://www.google.com/maps/embed?pb=!1m17!1m12!1m3!1d3422.813167866138!2d80.90667347543481!3d26.777802676727816!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m2!1m1!2zMjbCsDQ2JzQwLjEiTiA4MMKwNTQnMzMuMyJF!5e1!3m2!1sen!2sin!4v1763714832372!5m2!1sen!2sin"
             width="100%"
             height="100%"
             style={{ border: 0 }}
@@ -227,7 +230,7 @@ export default function Contact() {
       </section>
     </div>
   );
-}
+} 
 
 // ✅ Small helper for social icons
 function SocialIcon({ Icon, link }) {
