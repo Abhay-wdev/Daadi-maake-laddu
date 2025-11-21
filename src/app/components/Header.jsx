@@ -17,6 +17,7 @@ const Header = () => {
     { title: "Home", href: "/" },
     { title: "Products", href: "/products" },
     { title: "About", href: "/about-us" },
+    { title: "Contact", href: "/contact-us" },
     { title: "Blogs", href: "/blogs" },
   ]);
 
@@ -130,7 +131,7 @@ const Header = () => {
   const QuickContactButtons = () => (
     <div className="flex items-center gap-2 sm:gap-3">
       <Link
-        href="tel:+916378362945"
+        href="tel:+917800165704"
         className="flex items-center justify-center w-9 h-9 sm:w-10 sm:h-10 bg-gradient-to-r from-green-400 to-green-500 
                  rounded-full hover:from-green-500 hover:to-green-600 transition-all duration-300 shadow-md hover:shadow-lg
                  active:scale-95"
@@ -139,7 +140,7 @@ const Header = () => {
         <Phone size={18} className="text-white sm:w-5 sm:h-5" />
       </Link>
       <Link
-        href="https://wa.me/+916378362945"
+        href="https://wa.me/+917800165704"
         target="_blank"
         rel="noreferrer"
         className="flex items-center justify-center w-9 h-9 sm:w-10 sm:h-10 bg-gradient-to-r from-emerald-400 to-emerald-500 

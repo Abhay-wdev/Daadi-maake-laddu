@@ -7,6 +7,7 @@ import ProfilePage from "../components/ProfilePage";
 import ServicesPage from "../components/ServicesPage"; // Create this component
 import ShippingAddressManager from "../components/Address";
 import Cart from "../components/Cart";
+import OrdersPageWrapper from "../components/OrdersPage";
 
 export default function UserfilePage() {
   const [collapsed, setCollapsed] = useState(false);
@@ -21,6 +22,8 @@ export default function UserfilePage() {
         return <ShippingAddressManager />;
       case "Cart":
         return <Cart />;
+         case "Orders":
+        return  <OrdersPageWrapper/>;
       default:
         return <ProfilePage />;
     }

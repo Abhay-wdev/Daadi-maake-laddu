@@ -8,6 +8,7 @@ import {
   FaWhatsapp,
   FaYoutube,
 } from "react-icons/fa";
+import { motion } from "framer-motion";
 import toast, { Toaster } from "react-hot-toast";
 
 export default function Contact() {
@@ -55,13 +56,42 @@ export default function Contact() {
       <Toaster position="top-center" reverseOrder={false} />
 
       {/* Header */}
-      <section className="bg-[#BB4D00] text-white text-center py-14">
-        <h1 className="text-4xl md:text-5xl font-bold mb-3">Contact Us</h1>
-        <p className="text-lg max-w-2xl mx-auto">
-          We'd love to hear from you! Whether you have a question about our
-          products, orders, or anything else — our team is ready to help.
-        </p>
-      </section>
+     <motion.section
+  className="relative text-white text-center py-20 px-6 shadow-md overflow-hidden"
+  initial={{ opacity: 0, y: 80 }}
+  whileInView={{ opacity: 1, y: 0 }}
+  transition={{ duration: 1.2 }}
+  viewport={{ once: true }}
+  style={{
+    backgroundImage: "url('/images/about-poster.png')",
+    backgroundSize: "cover",
+    backgroundPosition: "center",
+  }}
+>
+  <motion.div
+    className="absolute inset-0 backdrop-blur-[1px]"
+    initial={{ opacity: 0 }}
+    whileInView={{ opacity: 1 }}
+    transition={{ duration: 1 }}
+  ></motion.div>
+
+  <motion.div
+    className="relative z-10 max-w-3xl mx-auto text-white"
+    initial={{ opacity: 0, y: 30 }}
+    whileInView={{ opacity: 1, y: 0 }}
+    transition={{ delay: 0.3, duration: 0.8 }}
+  >
+    <div className="inline-block bg-black/30 backdrop-blur-sm px-8 py-6 rounded-2xl shadow-xl">
+      <h1 className="text-4xl md:text-5xl font-bold mb-4 tracking-tight">
+        Contact Us
+      </h1>
+      <p className="text-lg md:text-xl max-w-2xl mx-auto text-gray-100">
+        We're here to help! Reach out to us for inquiries, support, or collaboration — our team will get back to you shortly.
+      </p>
+    </div>
+  </motion.div>
+</motion.section>
+
 
       {/* Contact Info + Form */}
       <section className="px-6 md:px-16 py-16 max-w-7xl mx-auto grid md:grid-cols-2 gap-10">

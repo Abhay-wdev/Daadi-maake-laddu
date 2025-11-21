@@ -1,5 +1,8 @@
-import Link from 'next/link';
+"use client";
 import React from 'react';
+import Link from 'next/link';
+import { motion } from 'framer-motion';
+import Image from 'next/image';
 
 const HandmadeSection = () => {
   return (
@@ -7,20 +10,44 @@ const HandmadeSection = () => {
       <div className="max-w-6xl mx-auto">
         <div className="flex flex-col lg:flex-row items-center gap-12">
           {/* Left Column - Text Content */}
-          <div className="lg:w-1/2">
-            <h1 className="text-4xl md:text-4xl font-serif  text-amber-900 mb-6 leading-tight">
+          <motion.div 
+            className="lg:w-1/2"
+            initial={{ opacity: 0, x: -60 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            transition={{ duration: 1, ease: "easeOut" }}
+            viewport={{ once: true }}
+          >
+            <motion.h1 
+              className="text-4xl md:text-4xl font-serif text-amber-900 mb-6 leading-tight"
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.2, duration: 0.8, ease: "easeOut" }}
+              viewport={{ once: true }}
+            >
               Pure Handmade.<br></br> Blessed by indian Tradition.
-            </h1>
+            </motion.h1>
 
-            <p className="text-lg text-gray-700 mb-8 leading-relaxed">
-              From <span className="font-semibold text-amber-800">Dadi Maa’s kitchen</span> to your home — our laddus are crafted 
+            <motion.p 
+              className="text-lg text-gray-700 mb-8 leading-relaxed"
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.4, duration: 0.8, ease: "easeOut" }}
+              viewport={{ once: true }}
+            >
+              From <span className="font-semibold text-amber-800">Dadi Maa's kitchen</span> to your home — our laddus are crafted 
               with love, purity, and age-old recipes that nourish both body and soul.  
               Every bite carries the warmth of home and the care of generations.
-            </p>
+            </motion.p>
 
             <div className="space-y-5 mb-10">
               {/* Feature 1 */}
-              <div className="flex items-start">
+              <motion.div 
+                className="flex items-start"
+                initial={{ opacity: 0, x: -20 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                transition={{ delay: 0.6, duration: 0.6, ease: "easeOut" }}
+                viewport={{ once: true }}
+              >
                 <div className="flex-shrink-0 mt-1">
                   <div className="w-8 h-8 rounded-full bg-[#fdf7e3] text-green-600 flex items-center justify-center">
                     <svg
@@ -42,10 +69,16 @@ const HandmadeSection = () => {
                 <p className="ml-4 text-lg text-gray-800">
                   🌿 <strong>100% Handmade</strong> — every laddu is shaped by hand, not by machines, preserving its authentic texture and taste.
                 </p>
-              </div>
+              </motion.div>
 
               {/* Feature 2 */}
-              <div className="flex items-start">
+              <motion.div 
+                className="flex items-start"
+                initial={{ opacity: 0, x: -20 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                transition={{ delay: 0.85, duration: 0.6, ease: "easeOut" }}
+                viewport={{ once: true }}
+              >
                 <div className="flex-shrink-0 mt-1">
                   <div className="w-8 h-8 rounded-full bg-[#fdf7e3] text-green-600 flex items-center justify-center">
                     <svg
@@ -67,10 +100,16 @@ const HandmadeSection = () => {
                 <p className="ml-4 text-lg text-gray-800">
                   💛 <strong>Preservative-Free Goodness</strong> — made with pure ghee, jaggery, and dry fruits; no chemicals, no shortcuts.
                 </p>
-              </div>
+              </motion.div>
 
               {/* Feature 3 */}
-              <div className="flex items-start">
+              <motion.div 
+                className="flex items-start"
+                initial={{ opacity: 0, x: -20 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                transition={{ delay: 1.1, duration: 0.6, ease: "easeOut" }}
+                viewport={{ once: true }}
+              >
                 <div className="flex-shrink-0 mt-1">
                   <div className="w-8 h-8 rounded-full bg-[#fdf7e3] text-green-600 flex items-center justify-center">
                     <svg
@@ -92,10 +131,16 @@ const HandmadeSection = () => {
                 <p className="ml-4 text-lg text-gray-800">
                   👩‍👧 <strong>Made by Local Women</strong> — empowering rural women through self-employment and skill development.
                 </p>
-              </div>
+              </motion.div>
 
               {/* Feature 4 */}
-              <div className="flex items-start">
+              <motion.div 
+                className="flex items-start"
+                initial={{ opacity: 0, x: -20 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                transition={{ delay: 1.35, duration: 0.6, ease: "easeOut" }}
+                viewport={{ once: true }}
+              >
                 <div className="flex-shrink-0 mt-1">
                   <div className="w-8 h-8 rounded-full bg-[#fdf7e3] text-green-600 flex items-center justify-center">
                     <svg
@@ -115,29 +160,58 @@ const HandmadeSection = () => {
                   </div>
                 </div>
                 <p className="ml-4 text-lg text-gray-800">
-                  🇮🇳 <strong>Rooted in Indian Tradition</strong> — inspired by recipes passed down from grandmothers’ kitchens, 
+                  🇮🇳 <strong>Rooted in Indian Tradition</strong> — inspired by recipes passed down from grandmothers' kitchens, 
                   bringing authentic taste and health together.
                 </p>
-              </div>
+              </motion.div>
             </div>
-<Link href="/products">
-            <button className="bg-[#BB4D00] text-white font-bold py-3 px-8 rounded-full text-lg transition duration-300 transform hover:scale-105 shadow-lg">
-              Shop Now
-            </button>
-            </Link>
-          </div>
+            
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ delay: 1.6, duration: 0.8, ease: "easeOut" }}
+              viewport={{ once: true }}
+            >
+              <Link href="/products">
+                <button className="bg-[#BB4D00] text-white font-bold py-3 px-8 rounded-full text-lg transition duration-300 transform hover:scale-105 shadow-lg">
+                  Shop Now
+                </button>
+              </Link>
+            </motion.div>
+          </motion.div>
 
           {/* Right Column - Image */}
-          <div className="lg:w-1/2 flex justify-center">
-            <div className="relative">
-              <div className="absolute inset-0 bg-gradient-to-r from-amber-200 to-red-200 rounded-2xl transform rotate-3 scale-105 opacity-70"></div>
-              <img
-                src="/images/ladduimage.webp"
-                alt="Dadi Maa Ke Laddu Handmade with Love"
-                className="relative rounded-2xl shadow-xl w-full max-w-md h-auto object-cover"
-              />
+          <motion.div 
+            className="lg:w-1/2 flex justify-center"
+            initial={{ opacity: 0, x: 60 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            transition={{ duration: 1, ease: "easeOut" }}
+            viewport={{ once: true }}
+          >
+            <div className="relative w-full max-w-md aspect-[4/3]">
+              <motion.div 
+                className="absolute inset-0 bg-gradient-to-r from-amber-200 to-red-200 rounded-2xl transform rotate-3 scale-105 opacity-70"
+                initial={{ opacity: 0, scale: 0.9 }}
+                whileInView={{ opacity: 0.7, scale: 1.05 }}
+                transition={{ delay: 0.8, duration: 1.2, ease: "easeOut" }}
+                viewport={{ once: true }}
+              ></motion.div>
+              <motion.div
+                initial={{ opacity: 0, scale: 0.9 }}
+                whileInView={{ opacity: 1, scale: 1 }}
+                transition={{ delay: 0.5, duration: 1, ease: "easeOut" }}
+                viewport={{ once: true }}
+                className="relative w-full h-full"
+              >
+                <Image
+                  src="/images/ladduimage.webp"
+                  alt="Dadi Maa Ke Laddu Handmade with Love"
+                  fill
+                  className="object-cover rounded-2xl shadow-xl"
+                />
+              </motion.div>
             </div>
-          </div>
+          </motion.div>
         </div>
       </div>
     </div>

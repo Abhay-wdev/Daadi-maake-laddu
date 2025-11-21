@@ -1,9 +1,7 @@
-"use client";
-
+'use client';
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import toast from 'react-hot-toast';
-import Link from 'next/link';
 
 const API_BASE = `${process.env.NEXT_PUBLIC_API_BASE_URL}/company`;
 
@@ -33,6 +31,8 @@ export default function CompanyManagement() {
     directors: [{ name: "", designation: "Director" }],
     businessType: "",
     socialLinks: [{ logoimage: "", social: "", link: "" }],
+    deliveryCharge: 0, // New field with default value
+    freeDeliveryUpto: 0, // New field with default value
   });
 
   const [logoFile, setLogoFile] = useState(null);
@@ -98,6 +98,8 @@ export default function CompanyManagement() {
       socialLinks: company.socialLinks?.length > 0 
         ? company.socialLinks 
         : [{ logoimage: "", social: "", link: "" }],
+      deliveryCharge: company.deliveryCharge || 0, // Load delivery charge
+      freeDeliveryUpto: company.freeDeliveryUpto || 0, // Load free delivery threshold
     });
     setCurrentView("form");
   };
@@ -134,6 +136,36 @@ export default function CompanyManagement() {
     } else {
       setFormData((prev) => ({ ...prev, [name]: value }));
     }
+  };
+
+  // 🔹 Handle delivery charge change
+  const handleDeliveryChargeChange = (e) => {
+    const value = e.target.value;
+    // Allow empty input for editing, but store as number
+    if (value === '') {
+      setFormData(prev => ({ ...prev, deliveryCharge: '' }));
+    } else {
+      const numValue = parseFloat(value);
+      if (!isNaN(numValue)) {
+        setFormData(prev => ({ ...prev, deliveryCharge: numValue }));
+      }
+    }
+    setErrors(prev => ({ ...prev, deliveryCharge: "" }));
+  };
+
+  // 🔹 Handle free delivery threshold change
+  const handleFreeDeliveryUptoChange = (e) => {
+    const value = e.target.value;
+    // Allow empty input for editing, but store as number
+    if (value === '') {
+      setFormData(prev => ({ ...prev, freeDeliveryUpto: '' }));
+    } else {
+      const numValue = parseFloat(value);
+      if (!isNaN(numValue)) {
+        setFormData(prev => ({ ...prev, freeDeliveryUpto: numValue }));
+      }
+    }
+    setErrors(prev => ({ ...prev, freeDeliveryUpto: "" }));
   };
 
   // 🔹 Handle directors
@@ -232,6 +264,20 @@ export default function CompanyManagement() {
     if (!formData.address.country.trim()) newErrors["address.country"] = "Country is required";
     if (!formData.address.postalCode.trim()) newErrors["address.postalCode"] = "Postal code is required";
     
+    // Validate delivery charge
+    if (formData.deliveryCharge === '') {
+      newErrors.deliveryCharge = "Delivery charge is required";
+    } else if (isNaN(formData.deliveryCharge) || formData.deliveryCharge < 0) {
+      newErrors.deliveryCharge = "Delivery charge must be a non-negative number";
+    }
+    
+    // Validate free delivery threshold
+    if (formData.freeDeliveryUpto === '') {
+      newErrors.freeDeliveryUpto = "Free delivery threshold is required";
+    } else if (isNaN(formData.freeDeliveryUpto) || formData.freeDeliveryUpto < 0) {
+      newErrors.freeDeliveryUpto = "Free delivery threshold must be a non-negative number";
+    }
+    
     if (formData.website && !/^(https?:\/\/)?([\da-z\.-]+)\.([a-z\.]{2,6})([\/\w \.-]*)*\/?$/.test(formData.website)) {
       newErrors.website = "Invalid website URL";
     }
@@ -268,6 +314,8 @@ export default function CompanyManagement() {
       directors: [{ name: "", designation: "Director" }],
       businessType: "",
       socialLinks: [{ logoimage: "", social: "", link: "" }],
+      deliveryCharge: 0, // Reset to default
+      freeDeliveryUpto: 0, // Reset to default
     });
     setLogoFile(null);
     setSocialFiles({});
@@ -405,6 +453,14 @@ export default function CompanyManagement() {
                             {company.address.postalCode}
                           </p>
                         )}
+                        {/* Delivery Charge */}
+                        <p className="text-sm text-gray-600">
+                          <span className="font-medium">Delivery Charge:</span> Rs {company.deliveryCharge?.toFixed(2) || '0.00'}
+                        </p>
+                        {/* Free Delivery Threshold */}
+                        <p className="text-sm text-gray-600">
+                          <span className="font-medium">Free Delivery Upto:</span> Rs {company.freeDeliveryUpto?.toFixed(2) || '0.00'}
+                        </p>
                         {company.gstNumber && (
                           <p className="text-sm text-gray-600">
                             <span className="font-medium">GST:</span> {company.gstNumber}
@@ -413,14 +469,14 @@ export default function CompanyManagement() {
                         {company.website && (
                           <p className="text-sm text-gray-600">
                             <span className="font-medium">Website:</span>{" "}
-                            <Link
+                            <a
                               href={company.website}
                               target="_blank"
                               rel="noopener noreferrer"
                               className="text-blue-600 hover:underline"
                             >
                               {company.website}
-                            </Link>
+                            </a>
                           </p>
                         )}
                       </div>
@@ -449,7 +505,7 @@ export default function CompanyManagement() {
                           <div className="flex flex-wrap gap-2 mt-1">
                             {company.socialLinks.map((social, idx) => (
                               social.link && (
-                                <Link
+                                <a
                                   key={idx}
                                   href={social.link}
                                   target="_blank"
@@ -464,7 +520,7 @@ export default function CompanyManagement() {
                                     />
                                   )}
                                   <span>{social.social}</span>
-                                </Link>
+                                </a>
                               )
                             ))}
                           </div>
@@ -578,6 +634,61 @@ export default function CompanyManagement() {
               )}
             </div>
           ))}
+        </div>
+
+        {/* Delivery Settings */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label className="block font-medium text-gray-700">
+              Delivery Charge (Rs) <span className="text-red-500">*</span>
+            </label>
+            <input
+              type="number"
+              name="deliveryCharge"
+              value={formData.deliveryCharge}
+              onChange={handleDeliveryChargeChange}
+              min="0"
+              step="0.01"
+              className={`w-full mt-1 p-2 border rounded-md ${errors.deliveryCharge ? 'border-red-500' : ''}`}
+            />
+            {errors.deliveryCharge && <p className="text-red-500 text-sm mt-1">{errors.deliveryCharge}</p>}
+          </div>
+          <div>
+            <label className="block font-medium text-gray-700">
+              Free Delivery Upto (Rs) <span className="text-red-500">*</span>
+            </label>
+            <input
+              type="number"
+              name="freeDeliveryUpto"
+              value={formData.freeDeliveryUpto}
+              onChange={handleFreeDeliveryUptoChange}
+              min="0"
+              step="0.01"
+              className={`w-full mt-1 p-2 border rounded-md ${errors.freeDeliveryUpto ? 'border-red-500' : ''}`}
+            />
+            {errors.freeDeliveryUpto && <p className="text-red-500 text-sm mt-1">{errors.freeDeliveryUpto}</p>}
+          </div>
+        </div>
+
+        {/* Business Type */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label className="block font-medium text-gray-700 mb-1">Business Type</label>
+            <select
+              name="businessType"
+              value={formData.businessType}
+              onChange={handleChange}
+              className="w-full p-2 border rounded-md"
+            >
+              <option value="">Select Business Type</option>
+              <option value="Private Limited">Private Limited</option>
+              <option value="Public Limited">Public Limited</option>
+              <option value="LLP">LLP</option>
+              <option value="Partnership">Partnership</option>
+              <option value="Proprietorship">Proprietorship</option>
+              <option value="Other">Other</option>
+            </select>
+          </div>
         </div>
 
         {/* Logo */}
@@ -740,23 +851,6 @@ export default function CompanyManagement() {
             {errors.registrationYear && (
               <p className="text-red-500 text-sm mt-1">{errors.registrationYear}</p>
             )}
-          </div>
-          <div>
-            <label className="block font-medium text-gray-700 mb-1">Business Type</label>
-            <select
-              name="businessType"
-              value={formData.businessType}
-              onChange={handleChange}
-              className="w-full p-2 border rounded-md"
-            >
-              <option value="">Select Business Type</option>
-              <option value="Private Limited">Private Limited</option>
-              <option value="Public Limited">Public Limited</option>
-              <option value="LLP">LLP</option>
-              <option value="Partnership">Partnership</option>
-              <option value="Proprietorship">Proprietorship</option>
-              <option value="Other">Other</option>
-            </select>
           </div>
         </div>
 

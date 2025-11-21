@@ -1,8 +1,9 @@
 "use client";
 import React, { useEffect, useState } from "react";
-import Image from "next/image";
 import Link from "next/link";
 import { Loader2 } from "lucide-react";
+import { motion } from "framer-motion";
+import Image from "next/image";
 
 const SubCategorySection = () => {
   const [subcategories, setSubcategories] = useState([]);
@@ -30,6 +31,26 @@ const SubCategorySection = () => {
 
     fetchSubcategories();
   }, []);
+
+  // Animation variants for the category cards
+  const cardVariants = {
+    hidden: { 
+      y: 80, 
+      opacity: 0,
+      scale: 0.9
+    },
+    visible: (index) => ({
+      y: 0,
+      opacity: 1,
+      scale: 1,
+      transition: {
+        type: "spring",
+        damping: 15,
+        stiffness: 100,
+        delay: index * 0.3
+      }
+    })
+  };
 
   if (loading) {
     return (
@@ -89,30 +110,38 @@ const SubCategorySection = () => {
       {/* Category Cards using FLEX */}
       <div className="flex flex-wrap justify-center items-center gap-10 md:gap-25">
         {subcategories.map((sub, index) => (
-          <Link
+          <motion.div
             key={sub._id}
-            href={`/products?subCategory=${sub.slug}`}
-            className="group flex flex-col items-center text-center w-80  transition-all duration-300 hover:scale-105"
+            variants={cardVariants}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, amount: 0.3 }}
+            custom={index}
+            className="group flex flex-col items-center text-center w-80 transition-all duration-300 hover:scale-105"
             onMouseEnter={() => setHoveredIndex(index)}
             onMouseLeave={() => setHoveredIndex(null)}
           >
-            {/* Image */}
-            <div className="relative  w-70 h-70 mb-4 flex items-center justify-center">
-              <Image
-                src={sub.image}
-                alt={sub.name}
-                fill
-                className="object-contain  rounded-2xl border transition-transform duration-700 ease-out group-hover:scale-110 drop-shadow-md"
-              />
-            </div>
+            <Link
+              href={`/products?subCategory=${sub.slug}`}
+              className="flex flex-col items-center text-center w-full"
+            >
+              {/* Image */}
+              <div className="relative w-70 h-70 mb-4 flex items-center justify-center">
+                <Image
+                  src={sub.image}
+                  alt={sub.name}
+                  fill
+                  className="object-contain rounded-2xl border transition-transform duration-700 ease-out group-hover:scale-110 drop-shadow-md"
+                  unoptimized
+                />
+              </div>
 
-            {/* Title */}
-            <h3 className="text-lg font-bold text-gray-800 uppercase group-hover:text-amber-800 transition-colors duration-300">
-              {sub.name}
-            </h3>
-
-          
-          </Link>
+              {/* Title */}
+              <h3 className="text-lg font-bold text-gray-800 uppercase group-hover:text-amber-800 transition-colors duration-300">
+                {sub.name}
+              </h3>
+            </Link>
+          </motion.div>
         ))}
       </div>
 

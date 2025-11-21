@@ -225,11 +225,12 @@ export default function ContactSystem() {
                 : "bg-red-100 text-red-800 border border-red-200"
             }`}
           >
-            {message.type === "success" ? (
-              <CheckCircle className="w-5 h-5" />
-            ) : (
-              <LinklertCircle className="w-5 h-5" />
-            )}
+           {message.type === "success" ? (
+  <CheckCircle className="w-5 h-5" />
+) : (
+  <AlertCircle className="w-5 h-5" />
+)}
+
             <span>{message.text}</span>
           </div>
         )}

@@ -40,6 +40,7 @@ export default function ShippingAddressManager() {
   const [isEditing, setIsEditing] = useState(false);
   const [editId, setEditId] = useState(null);
   const [showForm, setShowForm] = useState(false);
+  const [phoneError, setPhoneError] = useState("");
 
   // Theme colors
   const themeColor = "#943900";
@@ -58,8 +59,36 @@ export default function ShippingAddressManager() {
     }));
   };
 
+  // Phone number validation handler
+  const handlePhoneChange = (e) => {
+    const value = e.target.value;
+    
+    // Only allow digits and limit to 10 characters
+    const phoneValue = value.replace(/\D/g, '').slice(0, 10);
+    
+    // Update form data
+    setFormData(prev => ({
+      ...prev,
+      phone: phoneValue
+    }));
+    
+    // Validate phone number
+    if (phoneValue.length > 0 && phoneValue.length < 10) {
+      setPhoneError("Phone number must be exactly 10 digits");
+    } else {
+      setPhoneError("");
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
+    
+    // Validate phone number before submission
+    if (formData.phone.length !== 10) {
+      setPhoneError("Please enter a valid 10-digit phone number");
+      return;
+    }
+    
     if (!user?._id) return alert("User not logged in");
 
     // Prevent creating new address if one already exists
@@ -78,6 +107,7 @@ export default function ShippingAddressManager() {
 
     setFormData(initialForm);
     setShowForm(false);
+    setPhoneError(""); // Reset phone error
   };
 
   const handleEdit = (addr) => {
@@ -93,6 +123,7 @@ export default function ShippingAddressManager() {
     setEditId(null);
     setFormData(initialForm);
     setShowForm(false);
+    setPhoneError(""); // Reset phone error
   };
 
   // Helper function to get payment method icon
@@ -251,19 +282,28 @@ export default function ShippingAddressManager() {
                 
                 <div className="space-y-1">
                   <label className="text-sm font-medium text-gray-700">Phone *</label>
-                  <input
-                    type="text"
-                    name="phone"
-                    value={formData.phone}
-                    onChange={handleChange}
-                    placeholder="+91 98765 43210"
-                    className="w-full border border-gray-300 rounded-lg px-4 py-2.5 focus:ring-2 focus:border-transparent transition-all outline-none"
-                    style={{ 
-                      borderColor: themeColor,
-                      focusRing: themeColor,
-                    }}
-                    required
-                  />
+                  <div className="relative">
+                    <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                      <span className="text-gray-500">+91</span>
+                    </div>
+                    <input
+                      type="tel"
+                      name="phone"
+                      value={formData.phone}
+                      onChange={handlePhoneChange}
+                      placeholder="98765 43210"
+                      className="w-full border border-gray-300 rounded-lg pl-12 pr-4 py-2.5 focus:ring-2 focus:border-transparent transition-all outline-none"
+                      style={{ 
+                        borderColor: phoneError ? "#ef4444" : themeColor,
+                        focusRing: themeColor,
+                      }}
+                      required
+                    />
+                  </div>
+                  {phoneError && (
+                    <p className="mt-1 text-sm text-red-600">{phoneError}</p>
+                  )}
+                  <p className="text-xs text-gray-500 mt-1">Enter 10-digit mobile number without country code</p>
                 </div>
                 
                 <div className="space-y-1">
@@ -494,7 +534,7 @@ export default function ShippingAddressManager() {
               <div className="flex items-center gap-3 pt-4 border-t">
                 <button
                   type="submit"
-                  disabled={loading}
+                  disabled={loading || !!phoneError}
                   className="px-6 py-2.5 rounded-lg font-medium transition-all duration-200 shadow-md hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
                   style={{ 
                     backgroundColor: themeColor,
@@ -596,7 +636,7 @@ export default function ShippingAddressManager() {
                             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
                             </svg>
-                            {a.phone}
+                            +91 {a.phone}
                           </p>
                         </div>
                       </div>

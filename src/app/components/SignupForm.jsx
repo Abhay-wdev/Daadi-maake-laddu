@@ -1,99 +1,209 @@
-"use client";
-import React, { useState } from "react";
-import axios from "axios";
-import OtpVerification from "./OtpVerification";
+import React, { useState, useEffect } from "react";
+import { useRouter } from "next/router";
+import { useAuthStore } from "../../store/UserStore";
+import toast from "react-hot-toast";
 
-const SignupForm = () => {
-  const [step, setStep] = useState("signup"); // signup | otp
+export default function SignupForm() {
+  const router = useRouter();
+  const { step, message, loading, sendOtp, verifyOtp, goToStep } = useAuthStore();
+
+  const [email, setEmail] = useState("");
+  const [otp, setOtp] = useState("");
   const [form, setForm] = useState({
     name: "",
-    email: "",
     password: "",
-    confirmPassword: "",
+    phone: "",
   });
-  const [message, setMessage] = useState("");
 
-  const handleChange = (e) =>
-    setForm({ ...form, [e.target.name]: e.target.value });
+  // 🔔 Auto-toast when message updates
+  useEffect(() => {
+    if (!message) return;
+    const lowerMsg = message.toLowerCase();
 
-  const handleSubmit = async (e) => {
+    if (
+      lowerMsg.includes("success") ||
+      lowerMsg.includes("otp sent") ||
+      lowerMsg.includes("registered") ||
+      lowerMsg.includes("verified")
+    ) {
+      toast.success(message);
+    } else {
+      toast.error(message);
+    }
+  }, [message]);
+
+  // 🧠 Handle input changes
+  const handleFormChange = (e) => {
+    const { name, value } = e.target;
+    setForm((prev) => ({ ...prev, [name]: value }));
+  };
+
+  // 📨 Send OTP
+  const handleSendOtp = async (e) => {
     e.preventDefault();
 
-    if (form.password !== form.confirmPassword) {
-      setMessage("Passwords do not match!");
+    if (!email || !email.includes("@")) {
+      toast.error("Please enter a valid email address.");
       return;
     }
 
     try {
-      const res = await axios.post(`${process.env.NEXT_PUBLIC_API_BASE_URL}/auth/send-otp`, {
-        email: form.email,
-      });
-      if (res.status === 200) {
-        setMessage("OTP sent to your email!");
-        setStep("otp");
-      }
+      await sendOtp(email);
     } catch (err) {
-      setMessage(err.response?.data?.message || "Failed to send OTP");
+      const backendMsg = err?.response?.data?.message;
+      toast.error(backendMsg || "Failed to send OTP. Please try again.");
     }
   };
 
-  if (step === "otp")
-    return <OtpVerification formData={form} setStep={setStep} />;
+  // ✅ Verify OTP & Register
+  const handleVerifyOtp = async (e) => {
+    e.preventDefault();
 
+    if (!otp || otp.length < 4) {
+      toast.error("Please enter a valid 4-digit OTP.");
+      return;
+    }
+
+    if (form.password.length < 4) {
+      toast.error("Password must be at least 4 characters long.");
+      return;
+    }
+
+    if (!form.name.trim()) {
+      toast.error("Please enter your full name.");
+      return;
+    }
+
+    if (!form.phone.trim()) {
+      toast.error("Please enter your phone number.");
+      return;
+    }
+
+    const data = { email, otp, ...form };
+
+    try {
+      await verifyOtp(data, router);
+    } catch (err) {
+      const backendMsg = err?.response?.data?.message;
+      toast.error(backendMsg || "Verification failed. Please try again.");
+    }
+  };
+
+  // 🧱 UI
   return (
-    <div className="max-w-md mx-auto mt-16 p-8 border rounded-2xl shadow-lg bg-white">
-      <h2 className="text-2xl font-bold mb-4 text-center">Create Account</h2>
-      <form onSubmit={handleSubmit} className="space-y-4">
-        <input
-          name="name"
-          type="text"
-          placeholder="Full Name"
-          value={form.name}
-          onChange={handleChange}
-          required
-          className="w-full border px-3 py-2 rounded-md"
-        />
-        <input
-          name="email"
-          type="email"
-          placeholder="Email"
-          value={form.email}
-          onChange={handleChange}
-          required
-          className="w-full border px-3 py-2 rounded-md"
-        />
-        <input
-          name="password"
-          type="password"
-          placeholder="Password"
-          value={form.password}
-          onChange={handleChange}
-          required
-          className="w-full border px-3 py-2 rounded-md"
-        />
-        <input
-          name="confirmPassword"
-          type="password"
-          placeholder="Confirm Password"
-          value={form.confirmPassword}
-          onChange={handleChange}
-          required
-          className="w-full border px-3 py-2 rounded-md"
-        />
+    <div className="max-w-md mx-auto mt-20 p-8 bg-white border border-gray-200 rounded-2xl shadow-lg relative">
+      <h2 className="text-3xl font-semibold text-center text-[#BB4D00] mb-2">
+        Create Account
+      </h2>
+      <p className="text-center text-gray-500 mb-6">
+        {step === 1
+          ? "Enter your email to receive an OTP"
+          : "Verify OTP & complete registration"}
+      </p>
 
-        <button
-          type="submit"
-          className="w-full bg-indigo-600 text-white py-2 rounded-md hover:bg-indigo-700 transition"
-        >
-          Send OTP
-        </button>
-      </form>
+      {/* STEP 1: Email Input */}
+      {step === 1 && (
+        <form onSubmit={handleSendOtp} className="space-y-4">
+          <div>
+            <label className="block text-sm text-gray-600 mb-1">
+              Email Address
+            </label>
+            <input
+              type="email"
+              placeholder="example@email.com"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+              className="w-full border border-gray-300 px-3 py-2 rounded-md focus:ring-2 focus:ring-[#BB4D00] outline-none"
+            />
+          </div>
 
-      {message && (
-        <p className="mt-3 text-center text-sm text-gray-600">{message}</p>
+          <button
+            type="submit"
+            disabled={loading}
+            className="w-full bg-[#BB4D00] text-white font-medium py-2 rounded-md hover:bg-[#a04400] transition duration-200"
+          >
+            {loading ? "Sending OTP..." : "Send OTP"}
+          </button>
+        </form>
+      )}
+
+      {/* STEP 2: OTP + Registration Fields */}
+      {step === 2 && (
+        <form onSubmit={handleVerifyOtp} className="space-y-4">
+          <div>
+            <label className="block text-sm text-gray-600 mb-1">OTP</label>
+            <input
+              type="text"
+              placeholder="Enter 4-digit OTP"
+              value={otp}
+              onChange={(e) => setOtp(e.target.value)}
+              required
+              className="w-full border border-gray-300 px-3 py-2 rounded-md focus:ring-2 focus:ring-[#BB4D00] outline-none"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm text-gray-600 mb-1">Full Name</label>
+            <input
+              name="name"
+              type="text"
+              placeholder="Your Full Name"
+              value={form.name}
+              onChange={handleFormChange}
+              required
+              className="w-full border border-gray-300 px-3 py-2 rounded-md focus:ring-2 focus:ring-[#BB4D00] outline-none"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm text-gray-600 mb-1">Password</label>
+            <input
+              name="password"
+              type="password"
+              placeholder="Create a Password (min 4 characters)"
+              value={form.password}
+              onChange={handleFormChange}
+              required
+              minLength={4}
+              className="w-full border border-gray-300 px-3 py-2 rounded-md focus:ring-2 focus:ring-[#BB4D00] outline-none"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm text-gray-600 mb-1">
+              Phone Number
+            </label>
+            <input
+              name="phone"
+              type="text"
+              placeholder="Enter Phone Number"
+              value={form.phone}
+              onChange={handleFormChange}
+              required
+              className="w-full border border-gray-300 px-3 py-2 rounded-md focus:ring-2 focus:ring-[#BB4D00] outline-none"
+            />
+          </div>
+
+          {/* ACTION BUTTONS */}
+          <div className="flex items-center justify-between gap-3 mt-4">
+            <button
+              type="button"
+              onClick={() => goToStep(1)}
+              className="w-1/3 border border-[#BB4D00] text-[#BB4D00] py-2 rounded-md hover:bg-[#fff4ee] transition"
+            >
+              Back
+            </button>
+            <button
+              type="submit"
+              disabled={loading}
+              className="w-2/3 bg-[#BB4D00] text-white py-2 rounded-md hover:bg-[#a04400] transition"
+            >
+              {loading ? "Verifying..." : "Verify & Register"}
+            </button>
+          </div>
+        </form>
       )}
     </div>
   );
-};
-
-export default SignupForm;
+}

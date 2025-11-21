@@ -163,33 +163,30 @@ const Footer = () => {
               <div className="flex items-start">
                 <MapPin className="w-5 h-5 mr-3 mt-1 flex-shrink-0" />
                 <p className="text-sm">
-                  Sagar, 1, opp. VS Medihub, Nirman Nagar, Ranisati Nagar,
-                  Jaipur, Rajasthan 302019
+                 M-251
+Opp Vishwanath 
+Parag road 
+Ashiyana lucknow- 226012
                 </p>
               </div>
               <div className="flex items-center">
                 <Phone className="w-5 h-5 mr-3 flex-shrink-0" />
                 <Link
-                  href="tel:+919461677122"
+                  href="tel:+917800165704"
                   className="text-sm hover:text-white transition-colors duration-300"
                 >
-                  +91 9461677122
+                +91 78001 65704
                 </Link>
-                ,&nbsp;
-                <Link
-                  href="tel:+918949342270"
-                  className="text-sm hover:text-white transition-colors duration-300"
-                >
-                  +91 8949342270
-                </Link>
+                 
+              
               </div>
               <div className="flex items-center">
                 <Mail className="w-5 h-5 mr-3 flex-shrink-0" />
                 <Link
-                  href="mailto:info@seocialmedia.in"
+                  href="mailto: info@dadimaakeladdu.com"
                   className="text-sm hover:text-white transition-colors duration-300"
                 >
-                  info@seocialmedia.in
+                   info@dadimaakeladdu.com
                 </Link>
               </div>
             </div>
@@ -197,8 +194,8 @@ const Footer = () => {
         </div>
 
         {/* Copyright */}
-        <div className="mt-12 pt-8 border-t border-gray-800 text-center">
-          <p className="text-sm">© {currentYear} . All rights reserved.</p>
+        <div className="mt-12 pt-8 border-t border-gray-200 text-center">
+          <p className="text-sm text-gray-200">© {currentYear} Developed<a className="cursor-pointer text-green-50  hover:font-bold" href="https://viralnexus.in/"> VIRAL nexus.</a> All rights reserved.</p>
         </div>
       </div>
     </footer>

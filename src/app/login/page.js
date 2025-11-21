@@ -17,6 +17,9 @@ export default function LoginForm() {
   const [form, setForm] = useState({ email: "", password: "" });
   const [attempts, setAttempts] = useState(0);
 
+  // 🔥 NEW: UI inline error message (NO DESIGN CHANGE)
+  const [uiError, setUiError] = useState("");
+
   const router = useRouter();
   const { login, message, error, loading } = useAuthStore();
 
@@ -57,22 +60,20 @@ export default function LoginForm() {
 
     const result = await login(form, router);
 
+    // 🔥 SHOW UI ERROR INSTANTLY (FIRST TIME ALSO)
     if (!result?.success) {
-      setAttempts((prev) => prev + 1);
+      setUiError(result?.message || "Invalid email or password");
 
-      if (attempts + 1 === 2) {
-        toast.error("Multiple failed attempts. Forgot password option enabled.", {
-          duration: 4000,
-          icon: <FaExclamationTriangle className="text-red-500" />,
-        });
-      }
+      setAttempts((prev) => prev + 1);
+      return;
     } else {
+      setUiError("");
       setAttempts(0);
     }
   };
 
   // ----------------------------
-  // TOAST MESSAGES
+  // OPTIONAL: Additional Toasts
   // ----------------------------
   useEffect(() => {
     if (error) {
@@ -91,7 +92,6 @@ export default function LoginForm() {
   // ----------------------------
   return (
     <div className="max-w-md mx-auto mt-16 p-1">
-
       <div className="bg-gradient-to-br from-amber-50 to-amber-100 rounded-2xl shadow-xl p-8 border border-amber-200">
 
         {/* Header */}
@@ -102,6 +102,14 @@ export default function LoginForm() {
           <h2 className="text-3xl font-bold text-amber-800">Welcome Back</h2>
           <p className="text-amber-600 mt-2">Sign in to your account</p>
         </div>
+
+        {/* 🔥 Inline Error Message (NO UI CHANGE) */}
+        {uiError && (
+          <div className="mb-4 p-3 rounded-lg bg-red-100 border border-red-300 text-red-700 flex items-center gap-2">
+            <FaExclamationTriangle className="text-red-600" />
+            <span>{uiError}</span>
+          </div>
+        )}
 
         {/* Login Form */}
         <form onSubmit={handleSubmit} className="space-y-6">
@@ -189,9 +197,7 @@ export default function LoginForm() {
             <div className="flex items-start">
               <FaExclamationTriangle className="text-amber-600 mt-0.5 mr-2 flex-shrink-0" />
               <div className="flex-1">
-                <p className="text-amber-800 font-medium">
-                  Having trouble signing in?
-                </p>
+                <p className="text-amber-800 font-medium">Having trouble signing in?</p>
                 <p className="text-amber-700 text-sm mt-1">
                   You've attempted login multiple times.
                 </p>
@@ -218,6 +224,7 @@ export default function LoginForm() {
             <FaArrowRight className="ml-1 text-xs" />
           </Link>
         </div>
+
       </div>
     </div>
   );

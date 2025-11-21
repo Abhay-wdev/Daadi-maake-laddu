@@ -1,9 +1,11 @@
-import OrderManagement from "./components/Homepage";
+import Dashboard from "./components/Homepage";
+
+ 
 
 export default function Homepage() {
   return (
     <div>
-      <OrderManagement/>
+      <Dashboard/> 
     </div>
   );
 }

@@ -9,15 +9,18 @@ import { FaUsers } from "react-icons/fa";
 import { PiCardsThreeFill } from "react-icons/pi";
 import { FaBlogger } from "react-icons/fa";
 import { FaPersonCircleQuestion } from "react-icons/fa6";
+import { MdOutlineHomeWork } from "react-icons/md";
+import { MdReviews } from "react-icons/md";
 export default function Sidebar({ open, collapsed, setCollapsed, setSidebarOpen }) {
   const pathname = usePathname();
 
   const navItems = [
      
-       
+        { label: "Dashboard", path: "/admin", icon: <MdOutlineHomeWork /> },
      { label: "Quiries", path: "/admin/queries", icon: <FaPersonCircleQuestion /> },
    
      { label: "Blogs", path: "/admin/blogs", icon: <FaBlogger /> },
+      { label: "Testimonials", path: "/admin/testimonials", icon: <MdReviews /> },
     { label: "Hero Section", path: "/admin/hero", icon: <PiCardsThreeFill /> },
     
     

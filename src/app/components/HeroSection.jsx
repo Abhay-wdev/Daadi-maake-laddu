@@ -1,12 +1,7 @@
 "use client";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import axios from "axios";
-import Link from "next/link";
-// Configuration
-const API_BASE_URL =
-  process.env.NEXT_PUBLIC_API_URL ||
-  `${process.env.NEXT_PUBLIC_API_BASE_URL}`;
-const HERO_IMAGES_ENDPOINT = `${API_BASE_URL}/hero`;
+import Image from "next/image";
 
 const HeroSection = () => {
   const [heroImages, setHeroImages] = useState([]);
@@ -14,82 +9,94 @@ const HeroSection = () => {
   const [error, setError] = useState("");
   const [currentIndex, setCurrentIndex] = useState(0);
 
-  // Function to fetch hero images from API
+  const touchStartX = useRef(0);
+  const touchEndX = useRef(0);
+  const isDragging = useRef(false);
+
+  // For Next.js, environment variables are accessed with NEXT_PUBLIC_ prefix
+  const API_BASE_URL =
+    process.env.NEXT_PUBLIC_API_URL || process.env.NEXT_PUBLIC_API_BASE_URL;
+  const HERO_IMAGES_ENDPOINT = `${API_BASE_URL}/hero`;
+
+  // Fetch images
   const fetchHeroImages = async () => {
     try {
       setLoading(true);
-      const response = await axios.get(HERO_IMAGES_ENDPOINT);
-      const fetchedData = response.data;
-
-      // ✅ Save data with timestamp
+      const { data } = await axios.get(HERO_IMAGES_ENDPOINT);
       localStorage.setItem(
         "heroImages",
-        JSON.stringify({ data: fetchedData, savedAt: Date.now() })
+        JSON.stringify({ data, savedAt: Date.now() })
       );
-
-      setHeroImages(fetchedData);
+      setHeroImages(data || []);
       setError("");
     } catch (err) {
+      console.error(err);
       setError("Failed to fetch hero images");
-      console.error("Error fetching hero images:", err);
     } finally {
       setLoading(false);
     }
   };
 
-  // Load from localStorage or API
+  // Load from cache or API
   useEffect(() => {
     const cached = localStorage.getItem("heroImages");
-    const oneDay = 24 * 60 * 60 * 1000; // 24 hours in ms
+    const tenMinutes = 10 * 60 * 1000;
 
     if (cached) {
       const parsed = JSON.parse(cached);
-      const isExpired = Date.now() - parsed.savedAt > oneDay;
+      const isExpired = Date.now() - parsed.savedAt > tenMinutes;
 
-      if (!isExpired && parsed.data?.length > 0) {
-        // ✅ Use cached data
+      if (!isExpired && parsed.data?.length) {
         setHeroImages(parsed.data);
         setLoading(false);
         return;
       } else {
-        // ❌ Expired or invalid — remove
         localStorage.removeItem("heroImages");
       }
     }
 
-    // ✅ Fetch fresh data
     fetchHeroImages();
   }, []);
 
-  // Auto-advance carousel
+  // Auto-slide every 5s
   useEffect(() => {
     if (heroImages.length <= 1) return;
-
-    const interval = setInterval(() => {
-      setCurrentIndex((prevIndex) =>
-        prevIndex === heroImages.length - 1 ? 0 : prevIndex + 1
-      );
+    const id = setInterval(() => {
+      setCurrentIndex((i) => (i === heroImages.length - 1 ? 0 : i + 1));
     }, 5000);
-
-    return () => clearInterval(interval);
+    return () => clearInterval(id);
   }, [heroImages]);
 
-  const goToSlide = (index) => setCurrentIndex(index);
+  // Swipe controls
+  const handleTouchStart = (e) => {
+    touchStartX.current = e.touches[0].clientX;
+    isDragging.current = true;
+  };
+
+  const handleTouchMove = (e) => {
+    if (!isDragging.current) return;
+    touchEndX.current = e.touches[0].clientX;
+  };
+
+  const handleTouchEnd = () => {
+    if (!isDragging.current) return;
+    isDragging.current = false;
+    const delta = touchStartX.current - touchEndX.current;
+    if (delta > 40) goToNext();
+    if (delta < -40) goToPrev();
+  };
 
   const goToPrev = () =>
-    setCurrentIndex((prevIndex) =>
-      prevIndex === 0 ? heroImages.length - 1 : prevIndex - 1
-    );
-
+    setCurrentIndex((i) => (i === 0 ? heroImages.length - 1 : i - 1));
   const goToNext = () =>
-    setCurrentIndex((prevIndex) =>
-      prevIndex === heroImages.length - 1 ? 0 : prevIndex + 1
-    );
+    setCurrentIndex((i) => (i === heroImages.length - 1 ? 0 : i + 1));
+  const goToSlide = (i) => setCurrentIndex(i);
 
+  // Loading & Error States
   if (loading) {
     return (
       <div className="relative w-full h-96 bg-gray-200 flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[#BB4D00]"></div>
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-green-500" />
       </div>
     );
   }
@@ -102,7 +109,7 @@ const HeroSection = () => {
     );
   }
 
-  if (heroImages.length === 0) {
+  if (!heroImages.length) {
     return (
       <div className="relative w-full h-96 bg-gray-100 flex items-center justify-center">
         <p className="text-gray-600">No hero images available</p>
@@ -111,67 +118,60 @@ const HeroSection = () => {
   }
 
   return (
-    <div className="relative w-full h-96 md:h-[500px] overflow-hidden">
-      {/* Desktop Images */}
-      <div className="hidden md:block">
-        {heroImages.map((image, index) => (
-          <div
-            key={`desktop-${image._id}`}
-            className={`absolute inset-0 transition-opacity duration-700 ease-in-out ${
-              index === currentIndex ? "opacity-100" : "opacity-0"
-            }`}
+    <div
+      className="relative w-full h-96 md:h-[500px] overflow-hidden select-none"
+      onTouchStart={handleTouchStart}
+      onTouchMove={handleTouchMove}
+      onTouchEnd={handleTouchEnd}
+      style={{ touchAction: "pan-y" }}
+    >
+      {/* SLIDER TRACK */}
+      <div
+        className="absolute inset-0 flex h-full transition-transform duration-500 ease-out"
+        style={{ transform: `translateX(-${currentIndex * 100}%)` }}
+      >
+        {heroImages.map((image) => (
+          <a
+            key={image._id}
+            href={image.link || "#"}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="block w-full h-full flex-shrink-0"
           >
-            <Link
-              href={image.link}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="block w-full h-full"
-            >
-              <img
-                src={image.desktopImageUrl}
-                alt={`Hero slide ${index}`}
-                className="w-full h-full object-cover"
-              />
-               
-               
-            </Link>
-          </div>
+            <div className="relative w-full h-full">
+              {/* Desktop Image (hidden on mobile) */}
+              <div className="hidden md:block absolute inset-0">
+                <Image
+                  src={image.desktopImageUrl}
+                  alt={image.alt || "Hero slide"}
+                  fill
+                  className="object-cover"
+                  draggable="false"
+                  unoptimized
+                />
+              </div>
+              {/* Mobile Image (hidden on desktop) */}
+              <div className="md:hidden absolute inset-0">
+                <Image
+                  src={image.mobileImageUrl || image.desktopImageUrl}
+                  alt={image.alt || "Hero slide"}
+                  fill
+                  className="object-cover"
+                  draggable="false"
+                  unoptimized
+                />
+              </div>
+            </div>
+          </a>
         ))}
       </div>
 
-      {/* Mobile Images */}
-      <div className="md:hidden">
-        {heroImages.map((image, index) => (
-          <div
-            key={`mobile-${image._id}`}
-            className={`absolute inset-0 transition-opacity duration-700 ease-in-out ${
-              index === currentIndex ? "opacity-100" : "opacity-0"
-            }`}
-          >
-            <Link
-              href={image.link}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="block w-full h-full"
-            >
-              <img
-                src={image.mobileImageUrl || image.desktopImageUrl}
-                alt={`Hero slide ${index}`}
-                className="w-full h-full object-cover"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent"></div>
-               
-            </Link>
-          </div>
-        ))}
-      </div>
-
-      {/* Navigation Arrows */}
+      {/* DESKTOP/TABLET ARROWS (HIDDEN ON SMALL SCREENS) */}
       {heroImages.length > 1 && (
         <>
           <button
             onClick={goToPrev}
-            className="absolute left-4 top-1/2 -translate-y-1/2 bg-[#BB4D00]/70 hover:bg-[#BB4D00]/90 text-white p-2 rounded-full transition-all shadow-md"
+            className="hidden md:flex absolute left-4 top-1/2 cursor-pointer -translate-y-1/2 z-20 bg-amber-600/50 hover:bg-amber-700 text-white p-2 rounded-full transition-all shadow-md active:scale-95"
             aria-label="Previous slide"
           >
             <svg
@@ -184,7 +184,7 @@ const HeroSection = () => {
               <path
                 strokeLinecap="round"
                 strokeLinejoin="round"
-                strokeWidth={2}
+                strokeWidth={2.5}
                 d="M15 19l-7-7 7-7"
               />
             </svg>
@@ -192,7 +192,7 @@ const HeroSection = () => {
 
           <button
             onClick={goToNext}
-            className="absolute right-4 top-1/2 -translate-y-1/2 bg-[#BB4D00]/70 hover:bg-[#BB4D00]/90 text-white p-2 rounded-full transition-all shadow-md"
+            className="hidden md:flex absolute right-4 top-1/2 -translate-y-1/2 z-20 bg-amber-600/50 hover:bg-amber-700 text-white p-2 cursor-pointer rounded-full transition-all shadow-md active:scale-95"
             aria-label="Next slide"
           >
             <svg
@@ -205,7 +205,7 @@ const HeroSection = () => {
               <path
                 strokeLinecap="round"
                 strokeLinejoin="round"
-                strokeWidth={2}
+                strokeWidth={2.5}
                 d="M9 5l7 7-7 7"
               />
             </svg>
@@ -213,17 +213,17 @@ const HeroSection = () => {
         </>
       )}
 
-      {/* Indicators */}
+      {/* DOTS */}
       {heroImages.length > 1 && (
-        <div className="absolute bottom-4 left-0 right-0 flex justify-center space-x-2">
-          {heroImages.map((_, index) => (
+        <div className="absolute bottom-3 sm:bottom-4 left-0 right-0 flex justify-center space-x-2 z-20">
+          {heroImages.map((_, i) => (
             <button
-              key={index}
-              onClick={() => goToSlide(index)}
-              className={`w-3 h-3 rounded-full transition-all ${
-                index === currentIndex ? "bg-[#BB4D00]" : "bg-white/60"
+              key={i}
+              onClick={() => goToSlide(i)}
+              className={`w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full transition-all ${
+                i === currentIndex ? "bg-amber-600" : "bg-white/70"
               }`}
-              aria-label={`Go to slide ${index + 1}`}
+              aria-label={`Go to slide ${i + 1}`}
             />
           ))}
         </div>

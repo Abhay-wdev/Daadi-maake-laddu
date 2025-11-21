@@ -6,6 +6,7 @@ import { LuComponent } from "react-icons/lu";
 import { CgProfile } from "react-icons/cg";
 import { FaLocationArrow } from "react-icons/fa";
 import { MdOutlineShoppingCartCheckout } from "react-icons/md";
+import { MdWorkHistory } from "react-icons/md";
 export default function Sidebar({ open, collapsed, setCollapsed, setSidebarOpen, onSelect, activeLabel }) {
   const [isMobile, setIsMobile] = useState(false);
   
@@ -32,6 +33,7 @@ export default function Sidebar({ open, collapsed, setCollapsed, setSidebarOpen,
     { label: "Profile", icon: <CgProfile className="text-xl" /> },
     { label: "Address", icon: <FaLocationArrow className="text-xl" /> },
     { label: "Cart", icon: <MdOutlineShoppingCartCheckout className="text-xl" /> },
+    { label: "Orders", icon: <MdWorkHistory className="text-xl" /> },
     // Add more items here
   ];
 

@@ -1,16 +1,15 @@
-"use client";
-
+'use client';
 import React, { useEffect, useState } from "react";
-import Image from "next/image";
 import { ShoppingBag, Filter, ShoppingCart, Plus, Minus } from "lucide-react";
 import toast, { Toaster } from "react-hot-toast";
 import useCartStore from "../../store/useCartStore";
 import Link from "next/link";
-import { usePathname, useSearchParams } from "next/navigation";
+import { usePathname, useSearchParams, useRouter } from "next/navigation";
 
 const ProductsPage = () => {
   const pathname = usePathname();
   const searchParams = useSearchParams();
+  const router = useRouter();
   const [allProducts, setAllProducts] = useState([]);
   const [filteredProducts, setFilteredProducts] = useState([]);
   const [subCategories, setSubCategories] = useState([]);
@@ -69,12 +68,10 @@ const ProductsPage = () => {
     const fetchProductsAndCart = async () => {
       setLoading(true);
       try {
-        // Fetch products
         const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/products/all`);
         const data = await res.json();
         let products = data.products || [];
         
-        // Sort products by priorityNumber (descending: 3, 2, 1, 0)
         products.sort((a, b) => {
           const aPriority = a.priorityNumber !== undefined ? a.priorityNumber : 0;
           const bPriority = b.priorityNumber !== undefined ? b.priorityNumber : 0;
@@ -94,7 +91,6 @@ const ProductsPage = () => {
         });
         setSubCategories(uniqueSubs);
 
-        // Fetch cart only if authenticated
         if (userId && isAuthenticated) {
           await fetchCart(userId);
         }
@@ -140,11 +136,13 @@ const ProductsPage = () => {
 
   // Handle filter change and update URL
   const handleFilterChange = (subCategoryId) => {
+    setSelectedSubCategory(subCategoryId);
+    
     if (subCategoryId === null) {
       const params = new URLSearchParams(searchParams.toString());
       params.delete('subCategory');
       const newUrl = `${pathname}${params.toString() ? `?${params.toString()}` : ''}`;
-      window.history.pushState({}, '', newUrl);
+      router.push(newUrl);
     } else {
       const sub = subCategories.find(s => s._id === subCategoryId);
       if (sub) {
@@ -152,7 +150,7 @@ const ProductsPage = () => {
         const params = new URLSearchParams(searchParams.toString());
         params.set('subCategory', slug);
         const newUrl = `${pathname}?${params.toString()}`;
-        window.history.pushState({}, '', newUrl);
+        router.push(newUrl);
       }
     }
   };
@@ -227,60 +225,106 @@ const ProductsPage = () => {
         
         {/* Header - Only show on main products page */}
         {isMainProductsPage && (
-          <div className="text-center mb-12">
-            <div className="inline-block bg-[#BB4D00] text-white px-6 py-2 rounded-full mb-4">
-              <span className="font-bold">Premium Laddus & Delights</span>
-            </div>
-            <h1 className="text-5xl font-bold text-[#BB4D00] mb-4">Dadi ke Laddu Collection</h1>
-            <p className="text-[#BB4D00]/80 max-w-2xl mx-auto text-lg">
-              Handcrafted with love using traditional recipes passed down through generations. 
-              Each Laddu is a celebration of flavor and heritage.
-            </p>
-            
-            <div className="mt-8 flex justify-center">
-              <div className="relative">
-                {totalCartItems > 0 && (
-                  <div className="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-bold rounded-full w-6 h-6 flex items-center justify-center">
-                    {totalCartItems}
-                  </div>
-                )}
-                <Link href="/cart">
-                  <div className="bg-[#BB4D00] p-4 rounded-full shadow-lg hover:bg-[#A04000] transition cursor-pointer flex items-center gap-2">
-                    <ShoppingBag className="w-6 h-6 text-white" />
-                    <span className="text-white font-medium">View Cart</span>
-                  </div>
-                </Link>
-              </div>
+        <div className="text-center mb-12">
+
+          {/* 🧡 Tagline */}
+          <div
+            className="inline-block px-6 py-2 rounded-full mb-4 shadow-md"
+            style={{ backgroundColor: "#c05300" }}
+          >
+            <span className="font-bold text-white">
+              Traditional • Pure • Ghee-Rich
+            </span>
+          </div>
+
+          {/* 🥣 Title */}
+          <h1
+            className="text-5xl font-bold mb-4"
+            style={{ color: "#c05300" }}
+          >
+            Daadimaa’s Premium Laddu Collection
+          </h1>
+
+          {/* ✨ Description */}
+          <p
+            className="max-w-2xl mx-auto text-lg leading-relaxed"
+            style={{ color: "rgba(192, 83, 0, 0.8)" }}
+          >
+            Experience the warmth of <strong>ghar-jaisa swad</strong> with 
+            <strong> Daadimaa ke Laddoo</strong> — 
+            hand-rolled using <strong>shudh desi ghee</strong>, finest dry fruits,  
+            and age-old recipes. Every bite brings love, blessings and pure nostalgia.
+          </p>
+
+          {/* 🛒 Cart Button */}
+          <div className="mt-8 flex justify-center">
+            <div className="relative">
+              {totalCartItems > 0 && (
+                <div className="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-bold rounded-full w-6 h-6 flex items-center justify-center">
+                  {totalCartItems}
+                </div>
+              )}
+
+              <Link href="/cart" aria-label="View Cart">
+                <div
+                  className="p-4 rounded-full shadow-lg hover:shadow-xl transition cursor-pointer flex items-center gap-2"
+                  style={{ backgroundColor: "#c05300" }}
+                >
+                  <ShoppingBag className="w-6 h-6 text-white" />
+                  <span className="text-white font-medium">View Laddu Cart</span>
+                </div>
+              </Link>
             </div>
           </div>
+        </div>
         )}
 
         {/* Filter */}
-        <div className="bg-white rounded-2xl p-6 mb-10 shadow-sm border-2 border-[#BB4D00]/20">
+        <div className="bg-white rounded-2xl p-6 mb-10 shadow-sm" style={{ border: '2px solid rgba(192, 83, 0, 0.2)' }}>
           <div className="flex items-center gap-3 flex-wrap justify-center">
-            <div className="flex items-center gap-2 bg-[#BB4D00]/10 px-4 py-2 rounded-full">
-              <Filter className="w-5 h-5 text-[#BB4D00]" />
-              <span className="font-medium text-[#BB4D00]">Filter by Category:</span>
+            <div className="flex items-center gap-2 px-4 py-2 rounded-full" style={{ backgroundColor: 'rgba(192, 83, 0, 0.1)' }}>
+              <Filter className="w-5 h-5" style={{ color: '#c05300' }} />
+              <span className="font-medium" style={{ color: '#c05300' }}>
+                Choose Your Laddu Type:
+              </span>
             </div>
+
             <button
               onClick={() => handleFilterChange(null)}
               className={`px-6 py-3 rounded-full text-sm font-bold transition-all ${
                 selectedSubCategory === null
-                  ? "bg-[#BB4D00] text-white shadow-md"
-                  : "bg-white text-[#BB4D00] hover:bg-[#BB4D00]/5 border border-[#BB4D00]/20"
+                  ? "text-white shadow-md"
+                  : "hover:bg-opacity-5 border"
               }`}
+              style={selectedSubCategory === null 
+                ? { backgroundColor: '#c05300' } 
+                : { 
+                    color: '#c05300', 
+                    backgroundColor: 'white',
+                    borderColor: 'rgba(192, 83, 0, 0.2)'
+                  }
+              }
             >
               All Laddus
             </button>
+
             {subCategories.map((sub) => (
               <button
                 key={sub._id}
                 onClick={() => handleFilterChange(sub._id)}
                 className={`px-6 py-3 rounded-full text-sm font-bold transition-all ${
                   selectedSubCategory === sub._id
-                    ? "bg-[#BB4D00] text-white shadow-md"
-                    : "bg-white text-[#BB4D00] hover:bg-[#BB4D00]/5 border border-[#BB4D00]/20"
+                    ? "text-white shadow-md"
+                    : "hover:bg-opacity-5 border"
                 }`}
+                style={selectedSubCategory === sub._id 
+                  ? { backgroundColor: '#c05300' } 
+                  : { 
+                      color: '#c05300', 
+                      backgroundColor: 'white',
+                      borderColor: 'rgba(192, 83, 0, 0.2)'
+                    }
+                }
               >
                 {sub.name}
               </button>
@@ -292,24 +336,29 @@ const ProductsPage = () => {
         {loading ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
             {[...Array(8)].map((_, i) => (
-              <div key={i} className="bg-white rounded-2xl overflow-hidden shadow-sm animate-pulse border-2 border-[#BB4D00]/10">
-                <div className="h-64 bg-[#BB4D00]/10"></div>
+              <div key={i} className="bg-white rounded-2xl overflow-hidden shadow-sm" style={{ border: '2px solid rgba(192, 83, 0, 0.1)' }}>
+                <div style={{ height: '16rem', backgroundColor: 'rgba(192, 83, 0, 0.1)' }}></div>
                 <div className="p-5">
-                  <div className="h-6 bg-[#BB4D00]/10 rounded mb-2"></div>
-                  <div className="h-4 bg-[#BB4D00]/10 rounded w-3/4 mb-3"></div>
-                  <div className="h-8 bg-[#BB4D00]/10 rounded"></div>
+                  <div className="h-6 rounded mb-2" style={{ backgroundColor: 'rgba(192, 83, 0, 0.1)' }}></div>
+                  <div className="h-4 rounded w-3/4 mb-3" style={{ backgroundColor: 'rgba(192, 83, 0, 0.1)' }}></div>
+                  <div className="h-8 rounded" style={{ backgroundColor: 'rgba(192, 83, 0, 0.1)' }}></div>
                 </div>
               </div>
             ))}
           </div>
         ) : filteredProducts.length === 0 ? (
           <div className="text-center py-16">
-            <div className="w-24 h-24 mx-auto bg-[#BB4D00]/10 rounded-full flex items-center justify-center mb-6">
-              <ShoppingBag className="w-12 h-12 text-[#BB4D00]" />
+            <div className="w-24 h-24 mx-auto rounded-full flex items-center justify-center mb-6" style={{ backgroundColor: 'rgba(192, 83, 0, 0.1)' }}>
+              <ShoppingBag className="w-12 h-12" style={{ color: '#c05300' }} />
             </div>
-            <h3 className="text-2xl font-bold text-[#BB4D00] mb-2">No Laddus Found</h3>
-            <p className="text-[#BB4D00]/70 max-w-md mx-auto">
-              We couldn&apos;t find any Laddus in this category. Try selecting a different category.
+
+            <h3 className="text-2xl font-bold mb-2" style={{ color: '#c05300' }}>
+              No Laddus Available
+            </h3>
+
+            <p className="max-w-md mx-auto" style={{ color: 'rgba(192, 83, 0, 0.7)' }}>
+              The laddus you’re searching for are not available right now.  
+              Try exploring our other delicious varieties made with pure love & desi ghee.
             </p>
           </div>
         ) : (
@@ -350,87 +399,88 @@ const ProductsPage = () => {
                 return (
                   <div
                     key={productId}
-                    className="group bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2 border-2 border-[#BB4D00]/10"
+                    className="group bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2"
+                    style={{ border: '2px solid rgba(192, 83, 0, 0.1)' }}
                   >
-                    <Link href={`/products/${product.name.replace(/\s+/g, '-').toLowerCase()}`}>
-                      <div className="relative h-72 overflow-hidden bg-gradient-to-br from-orange-50 to-amber-50">
+                    <Link href={`/products/${product.slug.replace(/\s+/g, '-').toLowerCase()}`}>
+                      <div className="relative h-72 overflow-hidden" style={{ background: 'linear-gradient(to bottom right, rgba(192, 83, 0, 0.05), rgba(192, 83, 0, 0.1))' }}>
                         {discountBadge}
                         {priorityBadge}
                         {product.images?.length > 0 ? (
                           <>
-                            <Image
+                            <img
                               src={product.images[0]}
                               alt={product.name}
-                              fill
-                              className="object-cover transition-all duration-700 group-hover:scale-110"
+                              className="w-full h-full object-cover transition-all duration-700 group-hover:scale-110"
                             />
                             {hasSecondImage && (
-                              <Image
+                              <img
                                 src={product.images[1]}
                                 alt={product.name}
-                                fill
-                                className="object-cover absolute top-0 left-0 opacity-0 transition-opacity duration-700 group-hover:opacity-100"
+                                className="w-full h-full object-cover absolute top-0 left-0 opacity-0 transition-opacity duration-700 group-hover:opacity-100"
                               />
                             )}
                           </>
                         ) : (
-                          <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-orange-50 to-amber-50">
+                          <div className="w-full h-full flex items-center justify-center" style={{ background: 'linear-gradient(to bottom right, rgba(192, 83, 0, 0.05), rgba(192, 83, 0, 0.1))' }}>
                             <div className="text-center">
-                              <ShoppingBag className="w-12 h-12 text-[#BB4D00]/30 mx-auto" />
-                              <p className="text-[#BB4D00]/30 mt-2">No Image</p>
+                              <ShoppingBag className="w-12 h-12 mx-auto" style={{ color: 'rgba(192, 83, 0, 0.3)' }} />
+                              <p className="mt-2" style={{ color: 'rgba(192, 83, 0, 0.3)' }}>No Image</p>
                             </div>
                           </div>
                         )}
                       </div>
                     </Link>
-                    <div className="p-6 bg-gradient-to-b from-white to-orange-50">
-                      <Link href={`/products/${product.name.replace(/\s+/g, '-').toLowerCase()}`}>
-                        <h2 className="text-lg font-bold text-[#BB4D00] group-hover:text-[#A04000] transition-colors line-clamp-2 mb-2">
+                    <div className="p-6" style={{ background: 'linear-gradient(to bottom, white, rgba(192, 83, 0, 0.05))' }}>
+                      <Link href={`/products/${product.slug.replace(/\s+/g, '-').toLowerCase()}`}>
+                        <h2 className="text-lg font-bold group-hover:opacity-90 transition-colors line-clamp-2 mb-2" style={{ color: '#c05300' }}>
                           {product.name}
                         </h2>
                       </Link>
-                      <p className="text-sm text-[#BB4D00]/70 mb-4">
+                      <p className="text-sm mb-4 line-clamp-2" style={{ color: 'rgba(192, 83, 0, 0.7)', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
                         {product.shortdescription}  
                       </p>
                       
                       <div className="flex items-baseline gap-2 mb-5">
-                        <span className="text-2xl font-bold text-[#BB4D00]">
+                        <span className="text-2xl font-bold" style={{ color: '#c05300' }}>
                           ₹{discountedPrice.toLocaleString()}
                         </span>
                         {product.discount > 0 && (
-                          <span className="text-sm line-through text-[#BB4D00]/40">
+                          <span className="text-sm line-through" style={{ color: 'rgba(192, 83, 0, 0.4)' }}>
                             ₹{product.price.toLocaleString()}
                           </span>
                         )}
-                        <span className="text-xs bg-[#BB4D00]/10 text-[#BB4D00] px-2 py-1 rounded-full">
+                        <span className="text-xs px-2 py-1 rounded-full" style={{ backgroundColor: 'rgba(192, 83, 0, 0.1)', color: '#c05300' }}>
                           {product.weight}
                         </span>
                       </div>
 
                       {showControls ? (
                         <div className="flex items-center gap-3">
-                          <div className="flex items-center border-2 border-[#BB4D00]/20 rounded-full overflow-hidden flex-1">
+                          <div className="flex items-center rounded-full overflow-hidden flex-1" style={{ border: '2px solid rgba(192, 83, 0, 0.2)' }}>
                             <button
                               onClick={() => handleQuantityChange(productId, -1)}
                               disabled={isUpdating}
-                              className="px-4 py-3 bg-[#BB4D00]/5 hover:bg-[#BB4D00]/10 transition disabled:opacity-50 flex-1"
+                              className="px-4 py-3 transition disabled:opacity-50 flex-1"
+                              style={{ backgroundColor: 'rgba(192, 83, 0, 0.05)' }}
                             >
-                              <Minus className="w-5 h-5 text-[#BB4D00] mx-auto" />
+                              <Minus className="w-5 h-5 mx-auto" style={{ color: '#c05300' }} />
                             </button>
-                            <span className="px-4 py-3 text-[#BB4D00] font-bold text-lg min-w-[3rem] text-center bg-[#BB4D00]/5 relative">
+                            <span className="px-4 py-3 font-bold text-lg min-w-[3rem] text-center relative" style={{ color: '#c05300', backgroundColor: 'rgba(192, 83, 0, 0.05)' }}>
                               {quantities[productId] || 1}
                               {isUpdating && (
-                                <span className="absolute inset-0 flex items-center justify-center bg-[#BB4D00]/5">
-                                  <div className="w-5 h-5 border-2 border-[#BB4D00] border-t-transparent rounded-full animate-spin"></div>
+                                <span className="absolute inset-0 flex items-center justify-center" style={{ backgroundColor: 'rgba(192, 83, 0, 0.05)' }}>
+                                  <div className="w-5 h-5 border-2 rounded-full animate-spin" style={{ borderColor: '#c05300', borderTopColor: 'transparent' }}></div>
                                 </span>
                               )}
                             </span>
                             <button
                               onClick={() => handleQuantityChange(productId, 1)}
                               disabled={isUpdating}
-                              className="px-4 py-3 bg-[#BB4D00]/5 hover:bg-[#BB4D00]/10 transition disabled:opacity-50 flex-1"
+                              className="px-4 py-3 transition disabled:opacity-50 flex-1"
+                              style={{ backgroundColor: 'rgba(192, 83, 0, 0.05)' }}
                             >
-                              <Plus className="w-5 h-5 text-[#BB4D00] mx-auto" />
+                              <Plus className="w-5 h-5 mx-auto" style={{ color: '#c05300' }} />
                             </button>
                           </div>
                         </div>
@@ -439,7 +489,8 @@ const ProductsPage = () => {
                           {!isAuthenticated ? (
                             <Link href="/login">
                               <button
-                                className="w-full py-3 text-amber-50 rounded-full font-bold flex items-center justify-center gap-2 shadow-lg transition-all bg-amber-700 hover:shadow-xl"
+                                className="w-full py-3 text-white rounded-full font-bold flex items-center justify-center gap-2 shadow-lg transition-all hover:shadow-xl"
+                                style={{ backgroundColor: '#c05300' }}
                               >
                                 Login to Add
                               </button>
@@ -450,9 +501,19 @@ const ProductsPage = () => {
                               disabled={cartLoading || isUpdating || product.stock === 0}
                               className={`w-full py-3 rounded-full font-bold flex items-center justify-center gap-2 shadow-lg transition-all ${
                                 product.stock === 0
-                                  ? "bg-[#BB4D00]/10 text-[#BB4D00]/50 cursor-not-allowed"
-                                  : "bg-[#BB4D00] text-white hover:bg-[#A04000] hover:shadow-xl"
+                                  ? "cursor-not-allowed"
+                                  : "hover:shadow-xl"
                               }`}
+                              style={product.stock === 0
+                                ? { 
+                                    backgroundColor: 'rgba(192, 83, 0, 0.1)', 
+                                    color: 'rgba(192, 83, 0, 0.5)'
+                                  }
+                                : { 
+                                    backgroundColor: '#c05300', 
+                                    color: 'white'
+                                  }
+                              }
                             >
                               {isUpdating ? (
                                 <>
@@ -482,16 +543,17 @@ const ProductsPage = () => {
               <div className="text-center mt-12">
                 <button
                   onClick={() => setShowAllProducts(!showAllProducts)}
-                  className="px-8 py-4 bg-[#BB4D00] text-white font-bold rounded-full shadow-lg hover:bg-[#A04000] hover:shadow-xl transition-all flex items-center justify-center gap-2 mx-auto"
+                  className="px-8 py-4 text-white font-bold rounded-full shadow-lg hover:shadow-xl transition-all flex items-center justify-center gap-2 mx-auto"
+                  style={{ backgroundColor: '#c05300' }}
                 >
                   {showAllProducts ? (
                     <>
-                      Show Less Products
+                      Show Less Laddus
                       <Minus className="w-5 h-5" />
                     </>
                   ) : (
                     <>
-                      More Products
+                      More Laddus
                       <Plus className="w-5 h-5" />
                     </>
                   )}
