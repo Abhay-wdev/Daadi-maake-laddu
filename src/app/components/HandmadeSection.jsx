@@ -171,6 +171,7 @@ const HandmadeSection = () => {
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ delay: 1.6, duration: 0.8, ease: "easeOut" }}
               viewport={{ once: true }}
+              className='  flex lg:lg:justify-start justify-center'
             >
               <Link href="/products">
                 <button className="bg-[#BB4D00] text-white font-bold py-3 px-8 rounded-full text-lg transition duration-300 transform hover:scale-105 shadow-lg">
