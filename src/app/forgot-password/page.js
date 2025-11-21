@@ -3,7 +3,7 @@
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import { FaEnvelope, FaKey, FaLock, FaArrowRight } from "react-icons/fa";
-import toast, { Toaster } from "react-hot-toast";
+import toast from "react-hot-toast";
 
 export default function ForgotPassword() {
   const router = useRouter();
@@ -26,11 +26,15 @@ export default function ForgotPassword() {
 
     setLoading(true);
     try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/auth/forgot-password`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email }),
-      });
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_API_BASE_URL}/auth/forgot-password`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email }),
+        }
+      );
+
       const data = await res.json();
 
       if (data.success) {
@@ -65,11 +69,14 @@ export default function ForgotPassword() {
 
     setLoading(true);
     try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/auth/reset-password`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, otp, newPassword }),
-      });
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_API_BASE_URL}/auth/reset-password`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email, otp, newPassword }),
+        }
+      );
 
       const data = await res.json();
 
@@ -92,11 +99,11 @@ export default function ForgotPassword() {
   // ----------------------------
   return (
     <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-amber-50 to-amber-100">
-      <Toaster position="top-center" />
       <div className="bg-white shadow-lg rounded-2xl p-8 w-full max-w-md border border-amber-200">
         <h2 className="text-2xl font-bold text-amber-800 mb-2 text-center">
           {step === 1 ? "Forgot Password" : "Reset Your Password"}
         </h2>
+
         <p className="text-amber-600 text-center mb-6">
           {step === 1
             ? "Enter your email to receive an OTP"
@@ -197,7 +204,7 @@ export default function ForgotPassword() {
           </button>
         </form>
 
-        {/* Back to Login Link */}
+        {/* Back to Login */}
         <div className="mt-8 text-center">
           <button
             onClick={() => router.push("/signup")}
