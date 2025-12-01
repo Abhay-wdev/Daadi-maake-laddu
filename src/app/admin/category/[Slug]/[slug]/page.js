@@ -5,7 +5,7 @@ import { useParams } from 'next/navigation';
 import toast, { Toaster } from 'react-hot-toast';
 import { Upload, X, Edit2, Trash2, Plus, Image, Save, PackageSearch, DollarSign, Tag, Info, Sparkles, GripVertical, Leaf } from 'lucide-react';
 import { useProductStore } from '@/store/ProductStore';
-
+import { FaIndianRupeeSign } from "react-icons/fa6";
 // ----------------- Main Component -----------------
 export default function ProductManager() {
   const { Slug: categoryId, slug: subCategoryId } = useParams();
@@ -314,7 +314,8 @@ function ProductForm({
                 value={form.price}
                 onChange={(e) => setForm({ ...form, price: e.target.value })}
                 required
-                icon={<DollarSign size={18} />}
+                icon={<FaIndianRupeeSign size={18} />}
+                
               />
               <InputField
                 label="Discount in (%)"

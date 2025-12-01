@@ -82,7 +82,7 @@ const Header = () => {
           `${process.env.NEXT_PUBLIC_API_BASE_URL}/products/all/?limit=100`
         );
         const data = await res.json();
-
+ 
         // Group products by subCategory
         const grouped = {};
         data.products.forEach((product) => {

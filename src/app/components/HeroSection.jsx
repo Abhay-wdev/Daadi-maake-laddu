@@ -13,20 +13,16 @@ const HeroSection = () => {
   const touchEndX = useRef(0);
   const isDragging = useRef(false);
 
-  // For Next.js, environment variables are accessed with NEXT_PUBLIC_ prefix
+  // For Next.js, environment variables
   const API_BASE_URL =
     process.env.NEXT_PUBLIC_API_URL || process.env.NEXT_PUBLIC_API_BASE_URL;
   const HERO_IMAGES_ENDPOINT = `${API_BASE_URL}/hero`;
 
-  // Fetch images
+  // REAL-TIME FETCH (NO LOCAL STORAGE)
   const fetchHeroImages = async () => {
     try {
       setLoading(true);
       const { data } = await axios.get(HERO_IMAGES_ENDPOINT);
-      localStorage.setItem(
-        "heroImages",
-        JSON.stringify({ data, savedAt: Date.now() })
-      );
       setHeroImages(data || []);
       setError("");
     } catch (err) {
@@ -37,24 +33,8 @@ const HeroSection = () => {
     }
   };
 
-  // Load from cache or API
+  // Always fetch fresh API data on load
   useEffect(() => {
-    const cached = localStorage.getItem("heroImages");
-    const tenMinutes = 10 * 60 * 1000;
-
-    if (cached) {
-      const parsed = JSON.parse(cached);
-      const isExpired = Date.now() - parsed.savedAt > tenMinutes;
-
-      if (!isExpired && parsed.data?.length) {
-        setHeroImages(parsed.data);
-        setLoading(false);
-        return;
-      } else {
-        localStorage.removeItem("heroImages");
-      }
-    }
-
     fetchHeroImages();
   }, []);
 
@@ -92,7 +72,7 @@ const HeroSection = () => {
     setCurrentIndex((i) => (i === heroImages.length - 1 ? 0 : i + 1));
   const goToSlide = (i) => setCurrentIndex(i);
 
-  // Loading & Error States
+  // Loading State
   if (loading) {
     return (
       <div className="relative w-full h-96 bg-gray-200 flex items-center justify-center">
@@ -101,6 +81,7 @@ const HeroSection = () => {
     );
   }
 
+  // Error State
   if (error) {
     return (
       <div className="relative w-full h-96 bg-red-50 flex items-center justify-center">
@@ -109,6 +90,7 @@ const HeroSection = () => {
     );
   }
 
+  // No Data State
   if (!heroImages.length) {
     return (
       <div className="relative w-full h-96 bg-gray-100 flex items-center justify-center">
@@ -119,7 +101,7 @@ const HeroSection = () => {
 
   return (
     <div
-      className="relative w-full h-96 md:h-[500px] overflow-hidden select-none"
+      className="relative w-full h-96 md:h-[400px] overflow-hidden select-none"
       onTouchStart={handleTouchStart}
       onTouchMove={handleTouchMove}
       onTouchEnd={handleTouchEnd}
@@ -139,7 +121,7 @@ const HeroSection = () => {
             className="block w-full h-full flex-shrink-0"
           >
             <div className="relative w-full h-full">
-              {/* Desktop Image (hidden on mobile) */}
+              {/* Desktop Image */}
               <div className="hidden md:block absolute inset-0">
                 <Image
                   src={image.desktopImageUrl}
@@ -150,7 +132,8 @@ const HeroSection = () => {
                   unoptimized
                 />
               </div>
-              {/* Mobile Image (hidden on desktop) */}
+
+              {/* Mobile Image */}
               <div className="md:hidden absolute inset-0">
                 <Image
                   src={image.mobileImageUrl || image.desktopImageUrl}
@@ -166,7 +149,7 @@ const HeroSection = () => {
         ))}
       </div>
 
-      {/* DESKTOP/TABLET ARROWS (HIDDEN ON SMALL SCREENS) */}
+      {/* ARROWS */}
       {heroImages.length > 1 && (
         <>
           <button
